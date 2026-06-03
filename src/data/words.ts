@@ -1,0 +1,280 @@
+type Word = {
+  id: number;
+  characters: string;
+  pinyin: string | null;
+  meaning_en: string | null;
+  meaning_vi: string | null;
+  syno_vn: string | null;
+  word_type: string | null;
+  hsk_level: number | null;
+};
+
+// Mock database — mirrors the Supabase `words` table schema.
+// Swap this array for real Supabase queries in src/lib/words-repo.ts.
+const WORDS: Word[] = [
+  // +-------+
+  // | HSK 1 |
+  // +-------+
+  {
+    id: 1,
+    characters: "你好",
+    pinyin: "nǐ hǎo",
+    meaning_en: "hello; how are you",
+    meaning_vi: "xin chào",
+    syno_vn: null,
+    word_type: "phrase",
+    hsk_level: 1,
+  },
+  {
+    id: 2,
+    characters: "谢谢",
+    pinyin: "xiè xiè",
+    meaning_en: "thank you",
+    meaning_vi: "cảm ơn",
+    syno_vn: null,
+    word_type: "phrase",
+    hsk_level: 1,
+  },
+  {
+    id: 3,
+    characters: "再见",
+    pinyin: "zài jiàn",
+    meaning_en: "goodbye; see you again",
+    meaning_vi: "tạm biệt; hẹn gặp lại",
+    syno_vn: "tái kiến",
+    word_type: "phrase",
+    hsk_level: 1,
+  },
+  {
+    id: 4,
+    characters: "大",
+    pinyin: "dà",
+    meaning_en: "big; large; great",
+    meaning_vi: "to, lớn, đại",
+    syno_vn: "đại",
+    word_type: "adj",
+    hsk_level: 1,
+  },
+  {
+    id: 5,
+    characters: "人",
+    pinyin: "rén",
+    meaning_en: "person; people; human being",
+    meaning_vi: "người; nhân",
+    syno_vn: "nhân",
+    word_type: "noun",
+    hsk_level: 1,
+  },
+  {
+    id: 6,
+    characters: "中国",
+    pinyin: "Zhōngguó",
+    meaning_en: "China",
+    meaning_vi: "Trung Quốc",
+    syno_vn: "Trung Quốc",
+    word_type: "noun",
+    hsk_level: 1,
+  },
+  // +-------+
+  // | HSK 2 |
+  // +-------+
+  {
+    id: 7,
+    characters: "学习",
+    pinyin: "xué xí",
+    meaning_en: "to study; to learn",
+    meaning_vi: "học tập, học hỏi",
+    syno_vn: "học tập",
+    word_type: "verb",
+    hsk_level: 2,
+  },
+  {
+    id: 8,
+    characters: "朋友",
+    pinyin: "péng yǒu",
+    meaning_en: "friend",
+    meaning_vi: "bạn bè",
+    syno_vn: "bằng hữu",
+    word_type: "noun",
+    hsk_level: 2,
+  },
+  {
+    id: 9,
+    characters: "工作",
+    pinyin: "gōng zuò",
+    meaning_en: "work; job; to work",
+    meaning_vi: "công việc; làm việc",
+    syno_vn: "công tác",
+    word_type: "noun/verb",
+    hsk_level: 2,
+  },
+  {
+    id: 10,
+    characters: "开心",
+    pinyin: "kāi xīn",
+    meaning_en: "happy; joyful",
+    meaning_vi: "vui vẻ, vui lòng",
+    syno_vn: "khai tâm",
+    word_type: "adj",
+    hsk_level: 2,
+  },
+  {
+    id: 11,
+    characters: "知道",
+    pinyin: "zhī dào",
+    meaning_en: "to know; to be aware of",
+    meaning_vi: "biết, hiểu",
+    syno_vn: "tri đạo",
+    word_type: "verb",
+    hsk_level: 2,
+  },
+  // +-------+
+  // | HSK 3 |
+  // +-------+
+  {
+    id: 12,
+    characters: "出发",
+    pinyin: "chū fā",
+    meaning_en: "to depart; to set off",
+    meaning_vi: "khởi hành; xuất phát",
+    syno_vn: "xuất phát",
+    word_type: "verb",
+    hsk_level: 3,
+  },
+  {
+    id: 13,
+    characters: "帮助",
+    pinyin: "bāng zhù",
+    meaning_en: "to help; to assist; help",
+    meaning_vi: "giúp đỡ; hỗ trợ",
+    syno_vn: "bang trợ",
+    word_type: "verb/noun",
+    hsk_level: 3,
+  },
+  {
+    id: 14,
+    characters: "明白",
+    pinyin: "míng bái",
+    meaning_en: "to understand; clear; obvious",
+    meaning_vi: "hiểu rõ; sáng suốt",
+    syno_vn: "minh bạch",
+    word_type: "verb/adj",
+    hsk_level: 3,
+  },
+  {
+    id: 15,
+    characters: "问题",
+    pinyin: "wèn tí",
+    meaning_en: "question; problem; issue",
+    meaning_vi: "câu hỏi; vấn đề",
+    syno_vn: "vấn đề",
+    word_type: "noun",
+    hsk_level: 3,
+  },
+  {
+    id: 16,
+    characters: "感谢",
+    pinyin: "gǎn xiè",
+    meaning_en: "to thank; to be grateful; gratitude",
+    meaning_vi: "cảm ơn; biết ơn; lòng biết ơn",
+    syno_vn: "cảm tạ",
+    word_type: "verb/noun",
+    hsk_level: 3,
+  },
+  // +-------+
+  // | HSK 4 |
+  // +-------+
+  {
+    id: 17,
+    characters: "前进",
+    pinyin: "qián jìn",
+    meaning_en: "to advance; to move forward",
+    meaning_vi: "tiến lên; tiến về phía trước",
+    syno_vn: "tiền tiến",
+    word_type: "verb",
+    hsk_level: 4,
+  },
+  {
+    id: 18,
+    characters: "改变",
+    pinyin: "gǎi biàn",
+    meaning_en: "to change; to alter; change",
+    meaning_vi: "thay đổi; biến đổi",
+    syno_vn: "cải biến",
+    word_type: "verb/noun",
+    hsk_level: 4,
+  },
+  {
+    id: 19,
+    characters: "继续",
+    pinyin: "jì xù",
+    meaning_en: "to continue; to go on",
+    meaning_vi: "tiếp tục",
+    syno_vn: "kế tục",
+    word_type: "verb",
+    hsk_level: 4,
+  },
+  {
+    id: 20,
+    characters: "影响",
+    pinyin: "yǐng xiǎng",
+    meaning_en: "influence; to affect; to influence",
+    meaning_vi: "ảnh hưởng; tác động",
+    syno_vn: "ảnh hưởng",
+    word_type: "noun/verb",
+    hsk_level: 4,
+  },
+  {
+    id: 21,
+    characters: "努力",
+    pinyin: "nǔ lì",
+    meaning_en: "to work hard; diligent; effort",
+    meaning_vi: "nỗ lực; cố gắng; chăm chỉ",
+    syno_vn: "nỗ lực",
+    word_type: "verb/adj",
+    hsk_level: 4,
+  },
+  {
+    id: 22,
+    characters: "坚持",
+    pinyin: "jiān chí",
+    meaning_en: "to persist; to persevere; to insist",
+    meaning_vi: "kiên trì; bền bỉ",
+    syno_vn: "kiên trì",
+    word_type: "verb",
+    hsk_level: 4,
+  },
+  {
+    id: 23,
+    characters: "机会",
+    pinyin: "jī huì",
+    meaning_en: "opportunity; chance",
+    meaning_vi: "cơ hội; dịp",
+    syno_vn: "cơ hội",
+    word_type: "noun",
+    hsk_level: 4,
+  },
+  {
+    id: 24,
+    characters: "关系",
+    pinyin: "guān xì",
+    meaning_en: "relationship; connection; to concern",
+    meaning_vi: "quan hệ; mối liên hệ",
+    syno_vn: "quan hệ",
+    word_type: "noun/verb",
+    hsk_level: 4,
+  },
+  {
+    id: 25,
+    characters: "发展",
+    pinyin: "fā zhǎn",
+    meaning_en: "to develop; development; growth",
+    meaning_vi: "phát triển",
+    syno_vn: "phát triển",
+    word_type: "verb/noun",
+    hsk_level: 4,
+  },
+];
+
+export { WORDS };
+export type { Word };

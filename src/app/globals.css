@@ -1,0 +1,109 @@
+/* +-------+
+   | THEME |
+   +-------+
+   GM neutral CSS variables — background, text, border.
+   Source of truth: src/constants/colors.ts → GM_NEUTRAL_TOKENS.
+   Semantic palettes (brand, danger, warning, success, info) live in theme.ts. */
+
+:root,
+[data-mantine-color-scheme="light"] {
+  --gm-bg-dark:      hsl(0, 0%, 90%);
+  --gm-bg:           hsl(0, 0%, 95%);
+  --gm-bg-light:     hsl(0, 0%, 100%);
+  --gm-border:       hsl(0, 0%, 84%);
+  --gm-text-primary: hsl(0, 0%, 5%);
+  --gm-text-muted:   hsl(0, 0%, 30%);
+}
+
+[data-mantine-color-scheme="dark"] {
+  --gm-bg-dark:      hsl(0, 0%, 0%);
+  --gm-bg:           hsl(0, 0%, 5%);
+  --gm-bg-light:     hsl(0, 0%, 10%);
+  --gm-border:       hsl(0, 0%, 16%);
+  --gm-text-primary: hsl(0, 0%, 95%);
+  --gm-text-muted:   hsl(0, 0%, 70%);
+}
+
+/* +----------+
+   | DEFAULTS |
+   +----------+ */
+
+html,
+body {
+  height: 100dvh;
+}
+
+/* Desktop: grey canvas behind the centered shell. */
+@media (min-width: 600px) {
+  body {
+    background: hsl(0, 0%, 92%);
+  }
+}
+
+[data-mantine-color-scheme="dark"] body {
+  background: hsl(0, 0%, 8%);
+}
+
+/* +-------+
+   | SHELL |
+   +-------+
+   Phone-frame shell applied by layout.tsx. */
+
+.zh-frame-outer {
+  min-height: 100dvh;
+}
+
+.zh-app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+
+@media (min-width: 600px) {
+  .zh-frame-outer {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .zh-app-shell {
+    min-height: calc(100dvh - 48px);
+    height: auto;
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-default);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+  }
+}
+
+/* +---------------+
+   | CUSTOMIZATION |
+   +---------------+ */
+
+/* GMButton variant="row" */
+.gm-row-button:hover        { background-color: var(--mantine-color-default-hover); }
+.gm-row-button:active       { background-color: var(--mantine-color-default-hover); transform: scale(0.995); }
+.gm-row-button:focus-visible { outline: 2px solid var(--mantine-color-brand-5); outline-offset: 2px; }
+
+/* GMButton variant="tab" */
+.gm-tab-button:hover        { background-color: var(--mantine-color-default-hover); border-radius: var(--mantine-radius-md); }
+.gm-tab-button:focus-visible { outline: 2px solid var(--mantine-color-brand-5); outline-offset: 2px; }
+
+/* Chinese character display */
+.zh-characters {
+  font-family: var(--font-noto-serif-sc), "Noto Serif SC", serif;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--gm-text-primary);
+}
+
+/* Raw <code> tags — theme-aware. */
+code {
+  font-family: var(--mantine-font-family-monospace, monospace);
+  padding: 0.1em 0.5rem;
+  line-height: 1.5rem;
+  background: var(--mantine-color-default);
+  border: 1px solid var(--mantine-color-default-border);
+  color: var(--gm-text-primary);
+}
