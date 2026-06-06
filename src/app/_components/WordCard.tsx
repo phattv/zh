@@ -2,7 +2,7 @@ import { GMContainer } from "@/components/GMContainer";
 import { GMText } from "@/components/GMText";
 import { type Word } from "@/data/words";
 
-function WordCard({ word }: { word: Word }): JSX.Element {
+function WordCard({ word }: { word: Word }): React.JSX.Element {
   return (
     <GMContainer variant="card" gap="sm" px="sm" py="sm" fullHeight>
       <GMContainer>

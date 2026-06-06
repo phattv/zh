@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-function Body({ children }: React.PropsWithChildren<object>): JSX.Element {
+function Body({ children }: React.PropsWithChildren<object>): React.JSX.Element {
   return <ZhProviders>{children}</ZhProviders>;
 }
 
@@ -40,7 +40,7 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <html
       lang="zh"

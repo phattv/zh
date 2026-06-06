@@ -7,7 +7,7 @@ run:
 	$(BUN) run dev
 
 build:
-	$(BUN) build
+	$(BUN) run build
 
 install:
 	$(BUN) install

@@ -72,7 +72,7 @@ function toTitleCase(str: string): string {
   return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase());
 }
 
-function wrapWithTooltip(el: JSX.Element, tooltip?: string): JSX.Element {
+function wrapWithTooltip(el: React.JSX.Element, tooltip?: string): React.JSX.Element {
   return tooltip ? (
     <Tooltip label={tooltip} withArrow>
       {el}
@@ -82,7 +82,7 @@ function wrapWithTooltip(el: JSX.Element, tooltip?: string): JSX.Element {
   );
 }
 
-function wrapWithIndicator(el: JSX.Element, indicator?: boolean): JSX.Element {
+function wrapWithIndicator(el: React.JSX.Element, indicator?: boolean): React.JSX.Element {
   return indicator ? (
     <Indicator color="brand" inline processing>
       {el}
@@ -115,7 +115,7 @@ function GMButton({
   grow,
   href,
   withBorder,
-}: GMButtonProps): JSX.Element {
+}: GMButtonProps): React.JSX.Element {
   const resolvedStyle: GMStyleProp = grow ? { flex: 1 } : undefined;
   const textOrNode = typeof children === "string" ? toTitleCase(children) : children;
   const [confirming, setConfirming] = useState(false);

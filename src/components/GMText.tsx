@@ -107,7 +107,7 @@ function GMText({
   color,
   label,
   textAlign,
-}: GMTextProps): JSX.Element {
+}: GMTextProps): React.JSX.Element {
   const text = children;
 
   if (variant === "badge") {

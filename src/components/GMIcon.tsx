@@ -107,7 +107,7 @@ function GMIcon({
   bg = false,
   stroke = 2,
   radius = "md",
-}: GMIconProps): JSX.Element {
+}: GMIconProps): React.JSX.Element {
   const Icon = ICON_MAP[name];
   const iconSize = ICON_SIZES[size];
 

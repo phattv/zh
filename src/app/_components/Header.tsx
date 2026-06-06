@@ -50,7 +50,7 @@ function useDisplaySize() {
   return { size, cycleSize };
 }
 
-function Header(): JSX.Element {
+function Header(): React.JSX.Element {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { size, cycleSize } = useDisplaySize();
 

@@ -60,7 +60,7 @@ function GMContainer({
   fullHeight = false,
   scrollable = false,
   dim = false,
-}: GMContainerProps): JSX.Element {
+}: GMContainerProps): React.JSX.Element {
   const borderStyle = {
     ...(bb ? { borderBottom: BORDER } : {}),
     ...(bt ? { borderTop: BORDER } : {}),

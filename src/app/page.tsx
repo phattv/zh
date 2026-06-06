@@ -35,7 +35,7 @@ function filterWords(query: string): Word[] {
   });
 }
 
-function EmptyState({ query }: { query: string }): JSX.Element {
+function EmptyState({ query }: { query: string }): React.JSX.Element {
   if (query.length > 0) {
     return (
       <GMContainer align="center" py="xl" gap="sm">
@@ -62,7 +62,7 @@ function EmptyState({ query }: { query: string }): JSX.Element {
 // | PAGE             |
 // +------------------+
 
-function HomePage(): JSX.Element {
+function HomePage(): React.JSX.Element {
   const [query, setQuery] = useState("");
 
   const results = useMemo(() => filterWords(query), [query]);
