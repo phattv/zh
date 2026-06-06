@@ -1,15 +1,46 @@
+"use client";
+
+import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMText } from "@/components/GMText";
 import { type Word } from "@/data/words";
+import { useState } from "react";
+
+function speak(text: string, onDone: () => void) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  synth.cancel();
+  // cancel() is async with no callback — wait before queuing the next utterance
+  setTimeout(() => {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = "zh-CN";
+    utt.rate = 0.85;
+    utt.onend = onDone;
+    utt.onerror = onDone;
+    synth.speak(utt);
+  }, 80);
+}
 
 function WordCard({ word }: { word: Word }): React.JSX.Element {
+  const [speaking, setSpeaking] = useState(false);
+
+  function handleSpeak() {
+    if (speaking) return;
+    setSpeaking(true);
+    speak(word.chinese, () => setSpeaking(false));
+  }
+
   return (
     <GMContainer variant="card" gap="sm" px="sm" py="sm" fullHeight>
-      <GMContainer>
-        <span className="zh-characters">{word.chinese}</span>
-        <GMText variant="title" color="brand">
-          {word.pinyin}
-        </GMText>
+      <GMContainer variant="row" justify="space-between" align="flex-start">
+        <GMContainer>
+          <span className="zh-characters">{word.chinese}</span>
+          <GMContainer variant="row" align="center" gap="xs">
+            <GMButton variant="text" onClick={handleSpeak} disabled={speaking}>
+              {word.pinyin}
+            </GMButton>
+          </GMContainer>
+        </GMContainer>
       </GMContainer>
       <GMContainer>
         <GMText>{`[${(word.sino_vi ?? "—").toUpperCase()}]`}</GMText>

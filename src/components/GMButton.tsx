@@ -1,5 +1,6 @@
 "use client";
 
+import { SPACING } from "@/constants/sizes";
 import {
   ActionIcon,
   Anchor,
@@ -10,8 +11,13 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import Link from "next/link";
-import { type ReactElement, type ReactNode, useEffect, useRef, useState } from "react";
-import { SPACING } from "@/constants/sizes";
+import {
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { type GMIconProps } from "./GMIcon";
 
 // +--------+
@@ -44,9 +50,22 @@ type GMButtonSharedProps = {
 };
 
 type GMButtonProps =
-  | (GMButtonSharedProps & { variant: "icon"; children: ReactNode; tooltip: string })
-  | (GMButtonSharedProps & { variant: "row"; children: ReactNode; tooltip?: string })
-  | (GMButtonSharedProps & { variant: "link"; href: string; children: string; tooltip?: string })
+  | (GMButtonSharedProps & {
+      variant: "icon";
+      children: ReactNode;
+      tooltip: string;
+    })
+  | (GMButtonSharedProps & {
+      variant: "row";
+      children: ReactNode;
+      tooltip?: string;
+    })
+  | (GMButtonSharedProps & {
+      variant: "link";
+      href: string;
+      children: string;
+      tooltip?: string;
+    })
   | (GMButtonSharedProps & {
       variant?: Exclude<GMButtonVariant, "icon" | "row" | "link">;
       children: string;
@@ -68,11 +87,10 @@ const PADDING = {
 // | HELPERS |
 // +---------+
 
-function toTitleCase(str: string): string {
-  return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase());
-}
-
-function wrapWithTooltip(el: React.JSX.Element, tooltip?: string): React.JSX.Element {
+function wrapWithTooltip(
+  el: React.JSX.Element,
+  tooltip?: string,
+): React.JSX.Element {
   return tooltip ? (
     <Tooltip label={tooltip} withArrow>
       {el}
@@ -82,7 +100,10 @@ function wrapWithTooltip(el: React.JSX.Element, tooltip?: string): React.JSX.Ele
   );
 }
 
-function wrapWithIndicator(el: React.JSX.Element, indicator?: boolean): React.JSX.Element {
+function wrapWithIndicator(
+  el: React.JSX.Element,
+  indicator?: boolean,
+): React.JSX.Element {
   return indicator ? (
     <Indicator color="brand" inline processing>
       {el}
@@ -117,7 +138,7 @@ function GMButton({
   withBorder,
 }: GMButtonProps): React.JSX.Element {
   const resolvedStyle: GMStyleProp = grow ? { flex: 1 } : undefined;
-  const textOrNode = typeof children === "string" ? toTitleCase(children) : children;
+  const textOrNode = children;
   const [confirming, setConfirming] = useState(false);
   const [confirmCountdown, setConfirmCountdown] = useState(3);
   const resetTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -181,7 +202,9 @@ function GMButton({
       transition: "background-color 120ms ease, transform 40ms ease",
       opacity: disabled ? 0.5 : undefined,
       pointerEvents: disabled ? "none" : undefined,
-      border: withBorder ? "1px solid var(--mantine-color-default-border)" : undefined,
+      border: withBorder
+        ? "1px solid var(--mantine-color-default-border)"
+        : undefined,
       ...PADDING,
       ...(grow ? { flex: 1 } : {}),
     };
@@ -213,7 +236,12 @@ function GMButton({
   if (variant === "link") {
     return wrapWithIndicator(
       wrapWithTooltip(
-        <Anchor component={Link} href={href!} onClick={onClick} style={resolvedStyle}>
+        <Anchor
+          component={Link}
+          href={href!}
+          onClick={onClick}
+          style={resolvedStyle}
+        >
           {textOrNode}
         </Anchor>,
         tooltip,
@@ -253,13 +281,18 @@ function GMButton({
         className="gm-tab-button"
         style={{
           ...PADDING,
-          color: active ? "var(--mantine-color-brand-6)" : "var(--gm-text-muted)",
-          borderBottom: active ? "1px solid var(--mantine-color-brand-6)" : "1px solid transparent",
+          color: active
+            ? "var(--mantine-color-brand-6)"
+            : "var(--gm-text-muted)",
+          borderBottom: active
+            ? "1px solid var(--mantine-color-brand-6)"
+            : "1px solid transparent",
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.5 : 1,
           flexShrink: 0,
           whiteSpace: "nowrap",
-          transition: "color 120ms ease, border-color 120ms ease, background-color 120ms ease",
+          transition:
+            "color 120ms ease, border-color 120ms ease, background-color 120ms ease",
           ...(grow ? { flex: 1 } : {}),
         }}
       >
@@ -305,7 +338,8 @@ function GMButton({
           styles={{
             root: {
               ...PADDING,
-              transition: "background 200ms ease, color 200ms ease, border-color 200ms ease",
+              transition:
+                "background 200ms ease, color 200ms ease, border-color 200ms ease",
             },
           }}
           style={resolvedStyle}

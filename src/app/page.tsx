@@ -78,6 +78,7 @@ function HomePage(): React.JSX.Element {
             placeholder={SEARCH_PLACEHOLDER}
             value={query}
             onChange={(e) => setQuery(e.currentTarget.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
             leftSection={
               query.length > 0 ? (
                 <span

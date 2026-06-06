@@ -7,6 +7,7 @@
 - Expand search to match `en`, `vi`, `sino_vi` with Vietnamese diacritic normalization (`hoc` matches `học`)
 - Extract `Header` and `WordCard` into `src/app/_components/`; 2-column card grid with equal-height rows
 - Font-size toggle cycles S→M→L→S in a single icon button; search left icon toggles between 🔍 and ✕
+- Add speak feature when pressing on pinyin
 
 ---
 
