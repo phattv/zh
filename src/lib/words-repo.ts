@@ -1,15 +1,19 @@
 import { WORDS, type Word } from "@/data/words";
 
-// +--------------------+
-// | PINYIN NORMALIZER  |
-// +--------------------+
-// Strips tone diacritics so "qian" matches "qián", "hao" matches "hǎo", etc.
+// +-------------------+
+// | TEXT NORMALIZER   |
+// +-------------------+
+// Strips diacritics for accent-insensitive search across pinyin, Vietnamese, and Sino-Vietnamese.
+// ơ/ư/đ don't decompose via NFD so are replaced explicitly before stripping combining marks.
 
-function normalizePinyin(str: string): string {
+function normalizeText(str: string): string {
   return str
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
+    .replace(/[đĐ]/g, "d")
+    .replace(/[ơƠ]/g, "o")
+    .replace(/[ưƯ]/g, "u")
+    .normalize("NFD")
+    .replace(/\p{Mn}/gu, "")
     .trim();
 }
 
@@ -18,20 +22,21 @@ function normalizePinyin(str: string): string {
 // +------+
 // Data access layer — replace WORDS with a real Supabase client call when ready.
 //
-// Supabase equivalent:
-//   const { data } = await supabase
-//     .from('words')
-//     .select('*')
-//     .or(`pinyin.ilike.%${query}%,characters.ilike.%${query}%`)
+// Supabase equivalent (with unaccent extension):
+//   const { data } = await supabase.rpc('search_words', { query })
 //   return data ?? []
 
 async function searchWords(query: string): Promise<Word[]> {
-  const q = normalizePinyin(query);
+  const q = normalizeText(query);
   if (!q) return [];
 
   return WORDS.filter((word) => {
-    const pinyin = normalizePinyin(word.pinyin ?? "");
-    return pinyin.includes(q) || word.characters.includes(query.trim());
+    if (word.chinese.includes(query.trim())) return true;
+    if (normalizeText(word.pinyin).includes(q)) return true;
+    if (normalizeText(word.en).includes(q)) return true;
+    if (normalizeText(word.vi).includes(q)) return true;
+    if (normalizeText(word.sino_vi ?? "").includes(q)) return true;
+    return false;
   });
 }
 
@@ -39,4 +44,4 @@ async function getAllWords(): Promise<Word[]> {
   return WORDS;
 }
 
-export { searchWords, getAllWords };
+export { getAllWords, searchWords };

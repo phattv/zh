@@ -2,8 +2,8 @@ import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { type Metadata, type Viewport } from "next";
 import { Noto_Serif_SC, Plus_Jakarta_Sans } from "next/font/google";
-import { ZhProviders } from "./providers";
 import "./globals.css";
+import { ZhProviders } from "./providers";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -22,7 +22,8 @@ const notoSerifSC = Noto_Serif_SC({
 
 export const metadata: Metadata = {
   title: "汉语 · Hànyǔ",
-  description: "Search and learn Chinese words with pinyin, meanings, and Sino-Vietnamese equivalents",
+  description:
+    "Search and learn Chinese words with pinyin, meanings, and Sino-Vietnamese equivalents",
 };
 
 export const viewport: Viewport = {
@@ -35,11 +36,19 @@ function Body({ children }: React.PropsWithChildren<object>): JSX.Element {
   return <ZhProviders>{children}</ZhProviders>;
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
   return (
-    <html lang="zh" className={`${plusJakarta.variable} ${notoSerifSC.variable}`}>
+    <html
+      lang="zh"
+      className={`${plusJakarta.variable} ${notoSerifSC.variable}`}
+      suppressHydrationWarning
+    >
       <head>
-        <ColorSchemeScript defaultColorScheme="light" />
+        <ColorSchemeScript defaultColorScheme="dark" />
         {/* Apply stored display-size preference before first paint to prevent FOUC */}
         <script
           dangerouslySetInnerHTML={{
