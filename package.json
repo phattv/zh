@@ -12,6 +12,7 @@
   "dependencies": {
     "@mantine/core": "^9.3.0",
     "@tabler/icons-react": "^3.44.0",
+    "hanzi-writer": "^3.7.3",
     "hanzi-writer-data": "^2.0.1",
     "next": "^16.2.7",
     "react": "^19.2.7",

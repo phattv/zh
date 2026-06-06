@@ -159,7 +159,6 @@ function DrawingInput({
   }
 
   function onPointerDown(e: React.MouseEvent | React.TouchEvent) {
-    e.preventDefault();
     const pt = getPoint(e);
     if (!pt) return;
     isDrawingRef.current = true;
@@ -177,7 +176,6 @@ function DrawingInput({
   }
 
   function onPointerMove(e: React.MouseEvent | React.TouchEvent) {
-    e.preventDefault();
     if (!isDrawingRef.current) return;
     const pt = getPoint(e);
     if (!pt) return;
@@ -200,7 +198,6 @@ function DrawingInput({
   }
 
   function onPointerUp(e: React.MouseEvent | React.TouchEvent) {
-    e.preventDefault();
     if (!isDrawingRef.current) return;
     isDrawingRef.current = false;
     const stroke = currentStrokeRef.current;

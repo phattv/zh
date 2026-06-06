@@ -53,6 +53,13 @@ function useDisplaySize() {
 function Header(): React.JSX.Element {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { size, cycleSize } = useDisplaySize();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // Use defaultColorScheme ("dark") until after hydration to avoid mismatch,
+  // since localStorageColorSchemeManager reads localStorage synchronously on the
+  // client and may differ from the server-rendered default.
+  const isDark = mounted ? colorScheme === "dark" : true;
 
   return (
     <GMContainer bb py="xs" px="sm">
@@ -78,13 +85,9 @@ function Header(): React.JSX.Element {
           <GMButton
             variant="icon"
             onClick={toggleColorScheme}
-            tooltip={
-              colorScheme === "dark"
-                ? "Switch to light mode"
-                : "Switch to dark mode"
-            }
+            tooltip={isDark ? "Switch to light mode" : "Switch to dark mode"}
           >
-            <GMIcon name={colorScheme === "dark" ? "Sun" : "Moon"} />
+            <GMIcon name={isDark ? "Sun" : "Moon"} />
           </GMButton>
         </GMContainer>
       </GMContainer>

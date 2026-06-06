@@ -7,6 +7,7 @@ import { WORDS, type Word } from "@/data/words";
 import { TextInput } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { DrawingInput } from "./_components/DrawingInput";
+import { HANZI_CHAR_SIZE, HanziAnimation } from "./_components/HanziAnimation";
 import { Header } from "./_components/Header";
 import { WordCard } from "./_components/WordCard";
 
@@ -36,24 +37,101 @@ function filterWords(query: string): Word[] {
   });
 }
 
-function EmptyState({ query }: { query: string }): React.JSX.Element {
-  if (query.length > 0) {
-    return (
-      <GMContainer align="center" py="xl" gap="sm">
-        <GMIcon name="Search" size="xl" color="var(--gm-text-muted)" />
-        <GMText variant="subtitle">{`No results for "${query}"`}</GMText>
-        <GMText variant="secondary">Search something else</GMText>
-        <GMText variant="secondary">{SEARCH_PLACEHOLDER}</GMText>
-      </GMContainer>
-    );
+function NoResultsState({ query }: { query: string }): React.JSX.Element {
+  return (
+    <GMContainer align="center" py="xl" gap="sm">
+      <GMIcon name="Search" size="xl" color="var(--gm-text-muted)" />
+      <GMText variant="subtitle">{`No results for "${query}"`}</GMText>
+      <GMText variant="secondary">Search something else</GMText>
+      <GMText variant="secondary">{SEARCH_PLACEHOLDER}</GMText>
+    </GMContainer>
+  );
+}
+
+function StartState(): React.JSX.Element {
+  const [animated, setAnimated] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+
+  function handleSpeak() {
+    if (speaking) return;
+    setSpeaking(true);
+    const synth = window.speechSynthesis;
+    if (!synth) {
+      setSpeaking(false);
+      return;
+    }
+    synth.cancel();
+    setTimeout(() => {
+      const utt = new SpeechSynthesisUtterance("学");
+      utt.lang = "zh-CN";
+      utt.rate = 0.85;
+      utt.onend = () => setSpeaking(false);
+      utt.onerror = () => setSpeaking(false);
+      synth.speak(utt);
+    }, 80);
   }
 
   return (
-    <GMContainer align="center" py="xl" gap="md">
-      <GMIcon name="Book" size="xl" color="var(--mantine-color-brand-6)" bg />
-      <GMContainer gap="xs" align="center">
-        <GMText variant="title">Start searching</GMText>
-        <GMText variant="secondary">{SEARCH_PLACEHOLDER}</GMText>
+    <GMContainer align="center" py="xl" gap="lg">
+      <GMContainer align="center">
+        <GMIcon name="Book" size="xl" color="var(--mantine-color-brand-6)" bg />
+        <GMText variant="title">Start searching...</GMText>
+        <GMText variant="subtitle">{SEARCH_PLACEHOLDER}</GMText>
+      </GMContainer>
+
+      {/* Interactive demo */}
+      <GMContainer>
+        <GMContainer variant="row" align="center" gap="sm">
+          <div
+            onClick={() => setAnimated((a) => !a)}
+            style={{
+              width: HANZI_CHAR_SIZE,
+              height: HANZI_CHAR_SIZE,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+          >
+            {animated ? (
+              <HanziAnimation word="学" />
+            ) : (
+              <span className="zh-characters">学</span>
+            )}
+          </div>
+          <GMText variant="secondary">tap for strokes</GMText>
+        </GMContainer>
+        <GMContainer variant="row" align="center" gap="sm">
+          <div
+            style={{
+              width: HANZI_CHAR_SIZE,
+              height: HANZI_CHAR_SIZE,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <button
+              onClick={handleSpeak}
+              disabled={speaking}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: speaking ? "not-allowed" : "pointer",
+                color: "var(--mantine-color-brand-6)",
+                opacity: speaking ? 0.5 : 1,
+                fontSize: "inherit",
+                fontFamily: "inherit",
+                padding: 0,
+              }}
+            >
+              xué
+            </button>
+          </div>
+          <GMText variant="secondary">tap for sound</GMText>
+        </GMContainer>
       </GMContainer>
     </GMContainer>
   );
@@ -125,8 +203,10 @@ function HomePage(): React.JSX.Element {
               <WordCard key={word.chinese} word={word} />
             ))}
           </div>
+        ) : query.length > 0 ? (
+          <NoResultsState query={query} />
         ) : (
-          <EmptyState query={query} />
+          <StartState />
         )}
       </GMContainer>
     </GMContainer>

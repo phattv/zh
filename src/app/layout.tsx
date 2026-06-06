@@ -2,6 +2,7 @@ import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { type Metadata, type Viewport } from "next";
 import { Noto_Serif_SC, Plus_Jakarta_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ZhProviders } from "./providers";
 
@@ -50,7 +51,9 @@ export default function RootLayout({
       <head>
         <ColorSchemeScript defaultColorScheme="dark" />
         {/* Apply stored display-size preference before first paint to prevent FOUC */}
-        <script
+        <Script
+          id="display-size"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var s=localStorage.getItem('zh-display-size'),m={small:'14px',medium:'16px',large:'18px'};document.documentElement.style.fontSize=m[s]||'16px';}catch(e){}})();`,
           }}
