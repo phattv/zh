@@ -2,15 +2,19 @@
 
 ## 2026-06-06
 
-- Upgrade dependencies to React 19, Next.js 16, Mantine 9, TypeScript 6; add Makefile and Turbopack config
-- Revise words database with `chinese, pinyin, en, vi, sino_vi, types` fields, seed 60 real HSK 1–6 words
-- Upgrade search to work with `chinese, pinyin, en, vi, sino_vi` fields via text input
-- Implement handwriting recognition panel (`DrawingInput`) — draw on canvas, get top-8 character candidates, click to search
-- Extract `Header` and `WordCard` into `src/app/_components/`; 2-column card grid with equal-height rows
-- Font-size toggle cycles S→M→L→S in a single icon button; search left icon toggles between 🔍 and ✕
-- Implement click on chinese word to animate & pinyin to pronounce
-- Preprocess `hanzi-writer-data` medians into a 9574-character stroke-direction index with `build-hanzi` command
-- Use `hanzi-writer` to animate chinese characters
+- Config: Upgrade dependencies to React 19, Next.js 16, Mantine 9, TypeScript 6; add Makefile and Turbopack config
+- UI:
+  - Upgrade text input search to work with `chinese, pinyin, en, vi, sino_vi` fields
+  - Font-size toggle cycles S→M→L→S in a single icon button; search left icon toggles between 🔍 and ✕
+  - Tap on chinese words to animate & tap on pinyin to pronounce
+- Components: `src/app/_components/`
+  - `WordCard` 2-column card grid with equal-height rows
+  - `DrawingInput`: handwriting canvas → top-8 character candidates
+  - `HanziAnimation`: stroke-order animation via `hanzi-writer`
+- Data: `scripts` & `src/data`
+  - Schema: revised with `chinese, pinyin, en, vi, sino_vi, types` fields & `Type` enum
+  - Strokes: preprocess `hanzi-writer-data` medians into a 9574-character stroke-direction index with `build-hanzi` command
+  - Pipeline: 1. download, 2. parse, 3. enrichment, 4. generate, with `make data-*` commands, expand to 4995 HSK 1-6 words
 
 ---
 

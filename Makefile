@@ -1,8 +1,11 @@
-BUN ?= $(shell which bun)
+BUN  ?= $(shell which bun)
+NODE ?= $(shell which node)
 
 .DEFAULT_GOAL := run
 
-.PHONY: run build build-hanzi install
+.PHONY: run build build-hanzi install \
+        data-download data-parse data-enrich data-generate data-pipeline data-clean data-clean-all
+
 run:
 	$(BUN) run dev
 
@@ -14,3 +17,42 @@ build-hanzi:
 
 install:
 	$(BUN) install
+
+# ── Data pipeline ─────────────────────────────────────────────────────────────
+
+data-download:
+	$(NODE) scripts/download-hsk.mjs
+
+data-parse:
+	$(NODE) scripts/parse-hsk.mjs
+
+data-enrich:
+	@if [ -z "$(ANTHROPIC_API_KEY)" ]; then \
+		echo "Error: ANTHROPIC_API_KEY is not set"; \
+		echo "Usage: make data-enrich ANTHROPIC_API_KEY=sk-ant-..."; \
+		exit 1; \
+	fi
+	$(NODE) scripts/enrich-words.mjs
+
+data-generate:
+	$(NODE) scripts/generate-words-ts.mjs
+
+# Run the full pipeline (download → parse → enrich → generate)
+data-pipeline:
+	@if [ -z "$(ANTHROPIC_API_KEY)" ]; then \
+		echo "Error: ANTHROPIC_API_KEY is not set"; \
+		echo "Usage: make data-pipeline ANTHROPIC_API_KEY=sk-ant-..."; \
+		exit 1; \
+	fi
+	$(MAKE) data-download
+	$(MAKE) data-parse
+	$(MAKE) data-enrich ANTHROPIC_API_KEY=$(ANTHROPIC_API_KEY)
+	$(MAKE) data-generate
+
+# Delete intermediate files to force a full re-run (keeps downloaded source txt files)
+data-clean:
+	rm -f scripts/data/hsk-base.json scripts/data/hsk-enriched.json
+
+# Delete everything including downloaded source files
+data-clean-all:
+	rm -f scripts/data/hsk*.txt scripts/data/hsk-base.json scripts/data/hsk-enriched.json

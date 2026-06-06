@@ -30,12 +30,14 @@ The app is structured around six modes, accessible from a bottom nav (mobile) or
 The dictionary. Look up any word across all supported fields.
 
 **Word cards** show:
+
 - Chinese characters (tap → stroke order animation via [Hanzi Writer](https://hanziwriter.org/), auto-resets after 1s)
 - Pinyin (tap → pronunciation via Web Speech API, zh-CN)
 - Word types & English meaning
 - Sino-Vietnamese & Vietnamese meaning
 
 **Search input** supports:
+
 - Text: Chinese characters, pinyin, English, Sino-Vietnamese & Vietnamese meaning
 - Handwriting canvas: draw a character → recognition via stroke-direction index built from [hanzi-writer-data](https://github.com/chanind/hanzi-writer-data), appends to current query
 - Voice: use OS keyboard dictation (iOS mic key, macOS Dictation, Android voice input) — no in-app mic needed
@@ -47,10 +49,12 @@ The dictionary. Look up any word across all supported fields.
 Browse and study words. Mostly deterministic with some AI-generated enrichment cached per word.
 
 **Browse** words by:
+
 - HSK level (1–6)
 - Topic / thematic group (food, travel, time, etc.)
 
 **Word detail** — tap any card to expand:
+
 - Meaning explained in Chinese
 - Example sentences (AI-generated, cached)
 - Synonyms and antonyms
@@ -111,7 +115,7 @@ Chinese writing assistant. AI-driven.
 
 ## Data
 
-Words are currently seeded in `src/data/words.ts` (100 words, HSK 1–6). The data layer (`src/lib/words-repo.ts`) is designed to swap the static array for Supabase queries. Richer content (examples, synonyms, stroke data) will be AI-generated via Claude and cached in Supabase.
+`src/data/words.ts` is words database across HSK 1–6, auto-generated from open data + Claude enrichment. **Do not edit it by hand.**
 
 Each word:
 
@@ -120,12 +124,44 @@ Each word:
   chinese: "学习",
   pinyin:  "xuéxí",
   en:      "to study; to learn",
-  vi:      "học tập; học hỏi",
-  sino_vi: "HỌC TẬP",
-  types:   [Type.V],
+  vi:      "học tập; học hỏi",   // Claude-generated
+  sino_vi: "HỌC TẬP",            // Claude-generated, null if none
+  types:   [Type.V],             // Claude-generated
   hsk:     2,
 }
 ```
+
+### Pipeline
+
+Four scripts in `scripts/` build the word list from scratch:
+
+| Step | Script                  | Input               | Output                           | Notes               |
+| ---- | ----------------------- | ------------------- | -------------------------------- | ------------------- |
+| 0    | `download-hsk.mjs`      | glxxyz/hskhsk.com   | `scripts/data/hsk{1..6}.txt`     | Requires internet   |
+| 1    | `parse-hsk.mjs`         | `hsk{1..6}.txt`     | `scripts/data/hsk-base.json`     | Deterministic       |
+| 2    | `enrich-words.mjs`      | `hsk-base.json`     | `scripts/data/hsk-enriched.json` | Claude Haiku, ~$1–4 |
+| 3    | `generate-words-ts.mjs` | `hsk-enriched.json` | `src/data/words.ts`              | Deterministic       |
+
+### Make commands
+
+```bash
+make data-download                          # Step 0 — fetch source txt files from GitHub
+make data-parse                             # Step 1 — parse txt → hsk-base.json
+make data-enrich ANTHROPIC_API_KEY=sk-...   # Step 2 — enrich → hsk-enriched.json
+make data-generate                          # Step 3 — generate src/data/words.ts
+
+make data-pipeline ANTHROPIC_API_KEY=sk-... # Run all 4 steps in sequence
+
+make data-clean                             # Delete JSON intermediates (keeps source txt)
+make data-clean-all                         # Delete everything including source txt
+```
+
+### Refreshing / updating
+
+- **Re-enrich specific words**: delete their entries from `hsk-enriched.json`, then re-run `make data-enrich`. It skips already-enriched words.
+- **Add new words**: append to `hsk-base.json` manually, then run `make data-enrich` + `make data-generate`.
+- **Fix a bad translation**: edit the entry directly in `hsk-enriched.json`, then run `make data-generate`.
+- **Full regeneration**: `make data-clean-all` then `make data-pipeline`. Expect ~$1–4 in Claude API costs in around 10-20 minutes.
 
 ---
 

@@ -38,28 +38,34 @@ function WordCard({ word }: { word: Word }): React.JSX.Element {
         <GMContainer>
           <div
             onClick={() => setAnimated((a) => !a)}
-            style={{ height: HANZI_CHAR_SIZE, display: "flex", alignItems: "center", cursor: "pointer" }}
+            style={{
+              height: HANZI_CHAR_SIZE,
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
           >
             {animated ? (
-              <HanziAnimation word={word.chinese} onComplete={() => setTimeout(() => setAnimated(false), 1000)} />
+              <HanziAnimation word={word.chinese} />
             ) : (
               <span className="zh-characters">{word.chinese}</span>
             )}
           </div>
-          <GMContainer variant="row" align="center" gap="xs">
+          <GMContainer variant="row" align="center">
             <GMButton variant="text" onClick={handleSpeak} disabled={speaking}>
               {word.pinyin}
             </GMButton>
+            <GMText variant="badge" color="brand">{`HSK ${word.hsk}`}</GMText>
           </GMContainer>
         </GMContainer>
       </GMContainer>
       <GMContainer>
         <GMText>{`[${(word.sino_vi ?? "—").toUpperCase()}]`}</GMText>
-        <GMText truncate>{word.vi}</GMText>
+        <GMText>{word.vi}</GMText>
       </GMContainer>
       <GMContainer>
         <GMText>{`[${word.types.join(", ")}]`}</GMText>
-        <GMText truncate>{word.en}</GMText>
+        <GMText>{word.en}</GMText>
       </GMContainer>
     </GMContainer>
   );

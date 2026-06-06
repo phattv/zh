@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.101.0",
     "@mantine/core": "^9.3.0",
     "@tabler/icons-react": "^3.44.0",
     "hanzi-writer": "^3.7.3",

@@ -5,7 +5,7 @@ import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
 import { WORDS, type Word } from "@/data/words";
 import { TextInput } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DrawingInput } from "./_components/DrawingInput";
 import { HANZI_CHAR_SIZE, HanziAnimation } from "./_components/HanziAnimation";
 import { Header } from "./_components/Header";
@@ -95,7 +95,7 @@ function StartState(): React.JSX.Element {
             }}
           >
             {animated ? (
-              <HanziAnimation word="学" onComplete={() => setTimeout(() => setAnimated(false), 1000)} />
+              <HanziAnimation word="学" />
             ) : (
               <span className="zh-characters">学</span>
             )}
@@ -106,7 +106,6 @@ function StartState(): React.JSX.Element {
           <div
             style={{
               width: HANZI_CHAR_SIZE,
-              height: HANZI_CHAR_SIZE,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -143,7 +142,14 @@ function StartState(): React.JSX.Element {
 
 function HomePage(): React.JSX.Element {
   const [query, setQuery] = useState("");
-  const results = useMemo(() => filterWords(query), [query]);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 200);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const results = useMemo(() => filterWords(debouncedQuery), [debouncedQuery]);
 
   return (
     <GMContainer fullHeight>
@@ -186,9 +192,9 @@ function HomePage(): React.JSX.Element {
 
       {/* Search: drawing input */}
       <DrawingInput
-  onSelect={(char) => setQuery((q) => q + char)}
-  onBackspace={() => setQuery((q) => [...q].slice(0, -1).join(""))}
-/>
+        onSelect={(char) => setQuery((q) => q + char)}
+        onBackspace={() => setQuery((q) => [...q].slice(0, -1).join(""))}
+      />
 
       {/* Results list or empty state */}
       <GMContainer px="sm" grow scrollable>
@@ -205,7 +211,7 @@ function HomePage(): React.JSX.Element {
               <WordCard key={word.chinese} word={word} />
             ))}
           </div>
-        ) : query.length > 0 ? (
+        ) : debouncedQuery.length > 0 ? (
           <NoResultsState query={query} />
         ) : (
           <StartState />
