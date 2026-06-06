@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 2025",
-    "build": "next build",
+    "build": "bun run build:hanzi && next build",
+    "build:hanzi": "node scripts/build-hanzi-index.mjs",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@mantine/core": "^9.3.0",
     "@tabler/icons-react": "^3.44.0",
+    "hanzi-writer-data": "^2.0.1",
     "next": "^16.2.7",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

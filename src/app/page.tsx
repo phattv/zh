@@ -6,6 +6,7 @@ import { GMText } from "@/components/GMText";
 import { WORDS, type Word } from "@/data/words";
 import { TextInput } from "@mantine/core";
 import { useMemo, useState } from "react";
+import { DrawingInput } from "./_components/DrawingInput";
 import { Header } from "./_components/Header";
 import { WordCard } from "./_components/WordCard";
 
@@ -71,14 +72,16 @@ function HomePage(): React.JSX.Element {
     <GMContainer fullHeight>
       <Header />
 
-      {/* Search bar + result count row */}
+      {/* Search: text input */}
       <GMContainer variant="row" px="sm" py="sm" gap="sm" align="center">
         <GMContainer grow>
           <TextInput
             placeholder={SEARCH_PLACEHOLDER}
             value={query}
             onChange={(e) => setQuery(e.currentTarget.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+            }}
             leftSection={
               query.length > 0 ? (
                 <span
@@ -103,6 +106,9 @@ function HomePage(): React.JSX.Element {
           )}
         </GMContainer>
       </GMContainer>
+
+      {/* Search: drawing input */}
+      <DrawingInput onSelect={(char) => setQuery(char)} />
 
       {/* Results list or empty state */}
       <GMContainer px="sm" grow scrollable>

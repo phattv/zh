@@ -7,7 +7,10 @@
 - Expand search to match `en`, `vi`, `sino_vi` with Vietnamese diacritic normalization (`hoc` matches `học`)
 - Extract `Header` and `WordCard` into `src/app/_components/`; 2-column card grid with equal-height rows
 - Font-size toggle cycles S→M→L→S in a single icon button; search left icon toggles between 🔍 and ✕
-- Add speak feature when pressing on pinyin
+- Add speaker feature when pressing on pinyin
+- Add handwriting recognition panel (`DrawingInput`) — draw on canvas, get top-8 character candidates, click to search
+- Build `scripts/build-hanzi-index.mjs` to preprocess `hanzi-writer-data` medians into a 9574-character stroke-direction index (`public/hanzi-index/index.json`); runs automatically before `next build`
+-
 
 ---
 
