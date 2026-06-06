@@ -21,9 +21,17 @@ function charDataLoader(
     .catch(onError);
 }
 
-function HanziChar({ char }: { char: string }): React.JSX.Element {
+function HanziChar({
+  char,
+  onComplete,
+}: {
+  char: string;
+  onComplete?: () => void;
+}): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
   const writerRef = useRef<HanziWriter | null>(null);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ function HanziChar({ char }: { char: string }): React.JSX.Element {
     });
 
     writerRef.current = writer;
-    writer.animateCharacter();
+    writer.animateCharacter({ onComplete: () => onCompleteRef.current?.() });
 
     return () => {
       writerRef.current = null;
@@ -96,11 +104,30 @@ function HanziChar({ char }: { char: string }): React.JSX.Element {
   );
 }
 
-function HanziAnimation({ word }: { word: string }): React.JSX.Element {
+function HanziAnimation({
+  word,
+  onComplete,
+}: {
+  word: string;
+  onComplete?: () => void;
+}): React.JSX.Element {
+  const chars = [...word];
+  const doneRef = useRef(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  function handleCharDone() {
+    doneRef.current += 1;
+    if (doneRef.current === chars.length) {
+      doneRef.current = 0;
+      onCompleteRef.current?.();
+    }
+  }
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-      {[...word].map((char, i) => (
-        <HanziChar key={`${char}-${i}`} char={char} />
+      {chars.map((char, i) => (
+        <HanziChar key={`${char}-${i}`} char={char} onComplete={handleCharDone} />
       ))}
     </div>
   );

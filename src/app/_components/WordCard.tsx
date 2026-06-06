@@ -41,7 +41,7 @@ function WordCard({ word }: { word: Word }): React.JSX.Element {
             style={{ height: HANZI_CHAR_SIZE, display: "flex", alignItems: "center", cursor: "pointer" }}
           >
             {animated ? (
-              <HanziAnimation word={word.chinese} />
+              <HanziAnimation word={word.chinese} onComplete={() => setTimeout(() => setAnimated(false), 1000)} />
             ) : (
               <span className="zh-characters">{word.chinese}</span>
             )}

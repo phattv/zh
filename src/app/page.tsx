@@ -95,7 +95,7 @@ function StartState(): React.JSX.Element {
             }}
           >
             {animated ? (
-              <HanziAnimation word="学" />
+              <HanziAnimation word="学" onComplete={() => setTimeout(() => setAnimated(false), 1000)} />
             ) : (
               <span className="zh-characters">学</span>
             )}
@@ -143,7 +143,6 @@ function StartState(): React.JSX.Element {
 
 function HomePage(): React.JSX.Element {
   const [query, setQuery] = useState("");
-
   const results = useMemo(() => filterWords(query), [query]);
 
   return (
@@ -186,7 +185,10 @@ function HomePage(): React.JSX.Element {
       </GMContainer>
 
       {/* Search: drawing input */}
-      <DrawingInput onSelect={(char) => setQuery(char)} />
+      <DrawingInput
+  onSelect={(char) => setQuery((q) => q + char)}
+  onBackspace={() => setQuery((q) => [...q].slice(0, -1).join(""))}
+/>
 
       {/* Results list or empty state */}
       <GMContainer px="sm" grow scrollable>

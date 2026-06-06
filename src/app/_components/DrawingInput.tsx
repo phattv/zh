@@ -63,8 +63,10 @@ function findCandidates(
 
 function DrawingInput({
   onSelect,
+  onBackspace,
 }: {
   onSelect: (char: string) => void;
+  onBackspace?: () => void;
 }): React.JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDrawingRef = useRef(false);
@@ -213,16 +215,6 @@ function DrawingInput({
     }
   }
 
-  function handleUndo() {
-    strokesRef.current = strokesRef.current.slice(0, -1);
-    const n = strokesRef.current.length;
-    setStrokeCount(n);
-    redrawAll();
-    setCandidates(
-      n > 0 && index ? findCandidates(index, strokesRef.current) : [],
-    );
-  }
-
   function handleClear() {
     strokesRef.current = [];
     setStrokeCount(0);
@@ -263,10 +255,10 @@ function DrawingInput({
         {/* Right column: controls + candidates */}
         <GMContainer grow gap="xs">
           <GMContainer variant="row" gap="xs">
-            <GMButton variant="icon" tooltip="Undo last stroke" onClick={handleUndo}>
-              ↩
+            <GMButton variant="icon" tooltip="Backspace" onClick={onBackspace}>
+              ⌫
             </GMButton>
-            <GMButton variant="icon" tooltip="Clear" onClick={handleClear}>
+            <GMButton variant="icon" tooltip="Clear canvas" onClick={handleClear}>
               ✕
             </GMButton>
           </GMContainer>
