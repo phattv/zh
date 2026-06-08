@@ -7,7 +7,7 @@ import { GMText } from "@/components/GMText";
 import { type Word } from "@/data/words";
 import { segmentText, type Segment, type WordSegment } from "@/lib/segment";
 import { Table, Textarea } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Header } from "../_components/Header";
 
 // +------------------+
@@ -335,10 +335,28 @@ function HskStats({ segments }: { segments: Segment[] }): React.JSX.Element {
   );
 }
 
+const READ_PREFILL_KEY = "zh-read-prefill";
+
+async function pasteFromClipboard(set: (text: string) => void) {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) set(text);
+  } catch {}
+}
+
 function PassageMode(): React.JSX.Element {
   const [mode, setMode] = useState<"input" | "reading">("input");
   const [inputText, setInputText] = useState("");
   const [activeWord, setActiveWord] = useState<Word | null>(null);
+
+  useEffect(() => {
+    const prefill = sessionStorage.getItem(READ_PREFILL_KEY);
+    if (prefill) {
+      sessionStorage.removeItem(READ_PREFILL_KEY);
+      setInputText(prefill);
+      setMode("reading");
+    }
+  }, []);
   const [showPinyin, setShowPinyin] = useState(true);
   const [speaking, setSpeaking] = useState(false);
 
@@ -447,7 +465,16 @@ function PassageMode(): React.JSX.Element {
   return (
     <GMContainer px="sm" gap="md" grow scrollable>
       <GMContainer gap="xs">
-        <GMText variant="section_title">Paste Chinese text</GMText>
+        <GMContainer variant="row" justify="space-between" align="center">
+          <GMText variant="section_title">Paste Chinese text</GMText>
+          <GMButton
+            variant="icon"
+            onClick={() => pasteFromClipboard(setInputText)}
+            tooltip="Paste from clipboard"
+          >
+            <GMIcon name="ClipboardText" size="sm" />
+          </GMButton>
+        </GMContainer>
         <Textarea
           placeholder="e.g. 今天天气很好。"
           value={inputText}
@@ -510,7 +537,7 @@ function PassageMode(): React.JSX.Element {
               withBorder
               onClick={() => setInputText(sample.text)}
             >
-              <GMContainer gap="none">
+              <GMContainer>
                 <GMContainer
                   variant="row"
                   justify="space-between"
@@ -525,7 +552,7 @@ function PassageMode(): React.JSX.Element {
                   </GMText>
                 </GMContainer>
                 <GMText variant="secondary">
-                  {sample.text.slice(0, 32) + "…"}
+                  {sample.text.slice(0, 50) + "…"}
                 </GMText>
               </GMContainer>
             </GMButton>

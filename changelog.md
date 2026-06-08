@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-06-08
+
+- feat(write): add /write page with Analyze mode (grammar corrections + bilingual explanations, vocabulary upgrades, original vs corrected diff) and Develop mode (develop · longer · shorter · simpler · richer · HSK 1–6 transforms with character-level diff)
+- feat(write): add `/write/analyze` and `/write/develop` API routes backed by Claude Haiku
+
+---
+
 ## 2026-06-07
 
 - feat(nav): expand header to full 6-item app nav: Search · Learn · Listen · Speak · Read · Write

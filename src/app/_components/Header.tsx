@@ -33,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Listen", href: null },
   { label: "Speak", href: null },
   { label: "Read", href: ROUTES.read },
-  { label: "Write", href: null },
+  { label: "Write", href: ROUTES.write },
 ];
 
 function useDisplaySize() {
