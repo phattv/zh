@@ -1,10 +1,13 @@
 "use client";
 
+import { resolveColor } from "@/constants/colors";
+import { type SpacingValue } from "@/constants/sizes";
 import {
   IconAlertCircle,
   IconAlertTriangle,
   IconBook,
   IconBookmark,
+  IconBooks,
   IconBrandGoogleFilled,
   IconCheck,
   IconChevronDown,
@@ -17,6 +20,8 @@ import {
   IconLogout,
   IconMoon,
   IconPencil,
+  IconPlayerPause,
+  IconPlayerPlay,
   IconSearch,
   IconSettings,
   IconStar,
@@ -27,8 +32,6 @@ import {
   IconX,
   type TablerIcon,
 } from "@tabler/icons-react";
-import { resolveColor } from "@/constants/colors";
-import { type SpacingValue } from "@/constants/sizes";
 
 /**
  * GMIcon — visual context, never interactive alone.
@@ -42,6 +45,7 @@ const ICON_MAP = {
   AlertCircle: IconAlertCircle,
   AlertTriangle: IconAlertTriangle,
   Book: IconBook,
+  Books: IconBooks,
   Bookmark: IconBookmark,
   BrandGoogleFilled: IconBrandGoogleFilled,
   Check: IconCheck,
@@ -55,6 +59,8 @@ const ICON_MAP = {
   Logout: IconLogout,
   Moon: IconMoon,
   Pencil: IconPencil,
+  PlayerPause: IconPlayerPause,
+  PlayerPlay: IconPlayerPlay,
   Search: IconSearch,
   Settings: IconSettings,
   Star: IconStar,

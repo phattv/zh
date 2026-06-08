@@ -1,11 +1,9 @@
 import { WORDS, type Word } from "@/data/words";
 
-// +-------------------+
-// | TEXT NORMALIZER   |
-// +-------------------+
-// Strips diacritics for accent-insensitive search across pinyin, Vietnamese, and Sino-Vietnamese.
-// ơ/ư/đ don't decompose via NFD so are replaced explicitly before stripping combining marks.
-
+/**
+ * Strips diacritics for accent-insensitive search across pinyin, Vietnamese, and Sino-Vietnamese.
+ * ơ/ư/đ don't decompose via NFD so are replaced explicitly before stripping combining marks.
+ */
 function normalizeText(str: string): string {
   return str
     .toLowerCase()
@@ -17,15 +15,18 @@ function normalizeText(str: string): string {
     .trim();
 }
 
-// +------+
-// | REPO |
-// +------+
-// Data access layer — replace WORDS with a real Supabase client call when ready.
-//
-// Supabase equivalent (with unaccent extension):
-//   const { data } = await supabase.rpc('search_words', { query })
-//   return data ?? []
-
+/**
+ * Data access layer — replace WORDS with a real Supabase client call when ready.
+ *
+ * Supabase equivalent (with unaccent extension):
+ * ```sql
+ * const { data } = await supabase.rpc('search_words', { query })
+ * return data ?? []
+ * ```
+ *
+ * Matches against Chinese characters (exact), pinyin, English, Vietnamese, and Sino-Vietnamese,
+ * all accent-insensitive via {@link normalizeText}.
+ */
 async function searchWords(query: string): Promise<Word[]> {
   const q = normalizeText(query);
   if (!q) return [];
@@ -40,6 +41,7 @@ async function searchWords(query: string): Promise<Word[]> {
   });
 }
 
+/** Returns the full word list. Placeholder for a future `SELECT * FROM words` query. */
 async function getAllWords(): Promise<Word[]> {
   return WORDS;
 }

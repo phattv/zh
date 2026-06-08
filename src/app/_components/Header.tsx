@@ -1,8 +1,12 @@
+"use client";
+
 import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMIcon } from "@/components/GMIcon";
-import { GMText } from "@/components/GMText";
+import { ROUTES } from "@/constants/routes";
 import { useMantineColorScheme } from "@mantine/core";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type DisplaySize = "small" | "medium" | "large";
@@ -20,6 +24,17 @@ const DISPLAY_SIZE_LABEL: Record<DisplaySize, string> = {
   medium: "M",
   large: "L",
 };
+
+type NavItem = { label: string; href: string } | { label: string; href: null };
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "Search", href: ROUTES.home },
+  { label: "Learn", href: null },
+  { label: "Listen", href: null },
+  { label: "Speak", href: null },
+  { label: "Read", href: ROUTES.read },
+  { label: "Write", href: null },
+];
 
 function useDisplaySize() {
   const [size, setSize] = useState<DisplaySize>("medium");
@@ -54,25 +69,20 @@ function Header(): React.JSX.Element {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { size, cycleSize } = useDisplaySize();
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
   useEffect(() => setMounted(true), []);
 
-  // Use defaultColorScheme ("dark") until after hydration to avoid mismatch,
-  // since localStorageColorSchemeManager reads localStorage synchronously on the
-  // client and may differ from the server-rendered default.
   const isDark = mounted ? colorScheme === "dark" : true;
 
   return (
-    <GMContainer bb py="xs" px="sm">
-      <GMContainer variant="row" justify="space-between">
-        {/* App name */}
-        <GMContainer gap="xs">
-          <GMText variant="title">汉语</GMText>
-          <GMText variant="secondary">hànyǔ</GMText>
-        </GMContainer>
+    <GMContainer bb>
+      {/* Title row */}
+      <GMContainer variant="row" justify="space-between" py="xs" px="sm">
+        <GMButton variant="link" href="/">
+          zh.phattv.dev
+        </GMButton>
 
-        {/* Controls */}
         <GMContainer variant="row" gap="sm">
-          {/* Display size cycle */}
           <GMButton
             variant="icon"
             onClick={cycleSize}
@@ -81,7 +91,6 @@ function Header(): React.JSX.Element {
             {DISPLAY_SIZE_LABEL[size]}
           </GMButton>
 
-          {/* Theme toggle */}
           <GMButton
             variant="icon"
             onClick={toggleColorScheme}
@@ -90,6 +99,34 @@ function Header(): React.JSX.Element {
             <GMIcon name={isDark ? "Sun" : "Moon"} />
           </GMButton>
         </GMContainer>
+      </GMContainer>
+
+      {/* Nav tab strip */}
+      <GMContainer variant="row" px="sm" gap="none" scrollable>
+        {NAV_ITEMS.map((item) => {
+          const isActive =
+            mounted && item.href !== null && pathname === item.href;
+          const btn = (
+            <GMButton
+              variant="tab"
+              active={isActive}
+              disabled={item.href === null}
+            >
+              {item.label}
+            </GMButton>
+          );
+          return item.href !== null ? (
+            <Link
+              key={item.label}
+              href={item.href}
+              style={{ textDecoration: "none" }}
+            >
+              {btn}
+            </Link>
+          ) : (
+            <span key={item.label}>{btn}</span>
+          );
+        })}
       </GMContainer>
     </GMContainer>
   );

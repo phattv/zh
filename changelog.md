@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-06-07
+
+- feat(nav): expand header to full 6-item app nav: Search · Learn · Listen · Speak · Read · Write
+- feat(read): add /read page with passage reader with annotated text, TTS, 12 curated samples
+- refactor(lib): extract `segmentText` and `splitSentences` to `src/lib/segment.ts` (shared by both sub-tabs)
+
+---
+
 ## 2026-06-06
 
 - Config: Upgrade dependencies to React 19, Next.js 16, Mantine 9, TypeScript 6; add Makefile and Turbopack config
