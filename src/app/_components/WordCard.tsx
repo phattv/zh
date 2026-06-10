@@ -3,9 +3,11 @@
 import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMText } from "@/components/GMText";
+import { ROUTES } from "@/constants/routes";
 import { type Word } from "@/data/words";
+import Link from "next/link";
 import { useState } from "react";
-import { HANZI_CHAR_SIZE, HanziAnimation } from "./HanziAnimation";
+import { HANZI_CHAR_SIZE } from "./HanziAnimation";
 
 function speak(text: string, onDone: () => void) {
   const synth = window.speechSynthesis;
@@ -24,7 +26,6 @@ function speak(text: string, onDone: () => void) {
 
 function WordCard({ word }: { word: Word }): React.JSX.Element {
   const [speaking, setSpeaking] = useState(false);
-  const [animated, setAnimated] = useState(false);
 
   function handleSpeak() {
     if (speaking) return;
@@ -36,21 +37,21 @@ function WordCard({ word }: { word: Word }): React.JSX.Element {
     <GMContainer variant="card" gap="sm" px="sm" py="sm" fullHeight>
       <GMContainer variant="row" justify="space-between" align="flex-start">
         <GMContainer>
-          <div
-            onClick={() => setAnimated((a) => !a)}
-            style={{
-              height: HANZI_CHAR_SIZE,
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-            }}
+          <Link
+            href={`${ROUTES.learn}?word=${encodeURIComponent(word.chinese)}`}
+            style={{ textDecoration: "none" }}
           >
-            {animated ? (
-              <HanziAnimation word={word.chinese} />
-            ) : (
+            <div
+              style={{
+                height: HANZI_CHAR_SIZE,
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+            >
               <span className="zh-characters">{word.chinese}</span>
-            )}
-          </div>
+            </div>
+          </Link>
           <GMContainer variant="row" align="center">
             <GMButton variant="text" onClick={handleSpeak} disabled={speaking}>
               {word.pinyin}

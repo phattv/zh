@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-06-10
+
+- feat(learn): add /learn page with HSK level + topic browse, randomize button, and word detail view
+- feat(learn): add `/api/learn/enrich` route — AI enrichment (synonyms, antonyms, example sentences, explanation in Chinese) via Claude Haiku, cached per word in session
+- feat(learn): synonyms, antonyms, compounds, and "More HSK N" suggestions are tappable for word-to-word navigation
+- feat(search): tap Chinese character in word cards navigates to /learn word detail
+
+---
+
 ## 2026-06-08
 
 - feat(write): add /write page with Analyze mode (grammar corrections + bilingual explanations, vocabulary upgrades, original vs corrected diff) and Develop mode (develop · longer · shorter · simpler · richer · HSK 1–6 transforms with character-level diff)

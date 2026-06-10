@@ -29,7 +29,7 @@ type NavItem = { label: string; href: string } | { label: string; href: null };
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Search", href: ROUTES.home },
-  { label: "Learn", href: null },
+  { label: "Learn", href: ROUTES.learn },
   { label: "Listen", href: null },
   { label: "Speak", href: null },
   { label: "Read", href: ROUTES.read },

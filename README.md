@@ -25,7 +25,7 @@ The app is structured around six modes, accessible from a bottom nav (mobile) or
 
 ---
 
-### Search ✅
+### Search
 
 The dictionary. Look up any word across all supported fields.
 
