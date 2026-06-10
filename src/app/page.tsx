@@ -1,30 +1,15 @@
 "use client";
 
-import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
 import { WORDS, type Word } from "@/data/words";
 import { TextInput } from "@mantine/core";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DrawingInput } from "./_components/DrawingInput";
 import { HANZI_CHAR_SIZE, HanziAnimation } from "./_components/HanziAnimation";
 import { Header } from "./_components/Header";
 import { WordCard } from "./_components/WordCard";
-
-type LangMode = "zh" | "en" | "vi";
-
-const LANG_ATTR: Record<LangMode, string> = {
-  zh: "zh-CN",
-  en: "en",
-  vi: "vi",
-};
-
-const LANG_LABEL: Record<LangMode, string> = {
-  zh: "ZH",
-  en: "EN",
-  vi: "VI",
-};
 
 const SEARCH_PLACEHOLDER = `e.g. "学, xué, HỌC, học tập, study"`;
 
@@ -158,15 +143,6 @@ function StartState(): React.JSX.Element {
 function HomePage(): React.JSX.Element {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [langMode, setLangMode] = useState<LangMode>("zh");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function switchLang(lang: LangMode) {
-    setLangMode(lang);
-    // blur + rAF focus so the IME reinitializes with the new lang attribute
-    inputRef.current?.blur();
-    requestAnimationFrame(() => inputRef.current?.focus());
-  }
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 200);
@@ -180,51 +156,37 @@ function HomePage(): React.JSX.Element {
       <Header />
 
       {/* Search: text input */}
-      <GMContainer px="sm" py="sm" gap="xs">
-        <GMContainer variant="row" gap="sm" align="center">
-          <GMContainer grow>
-            <TextInput
-              ref={inputRef}
-              lang={LANG_ATTR[langMode]}
-              placeholder={SEARCH_PLACEHOLDER}
-              value={query}
-              onChange={(e) => setQuery(e.currentTarget.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.currentTarget.blur();
-              }}
-              autoCorrect="off"
-              spellCheck={false}
-              leftSection={
-                query.length > 0 ? (
-                  <span
-                    onClick={() => setQuery("")}
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <GMIcon name="X" color="var(--gm-text-muted)" />
-                  </span>
-                ) : (
-                  <GMIcon name="Search" color="var(--gm-text-muted)" />
-                )
-              }
-            />
-          </GMContainer>
-          {/* Language input mode chips */}
-          <GMContainer variant="row" gap="xs">
-            {(["zh", "en", "vi"] as LangMode[]).map((lang) => (
-              <GMButton
-                key={lang}
-                variant="chip"
-                active={langMode === lang}
-                onClick={() => switchLang(lang)}
-              >
-                {LANG_LABEL[lang]}
-              </GMButton>
-            ))}
-          </GMContainer>
+      <GMContainer variant="row" px="sm" py="sm" gap="sm" align="center">
+        <GMContainer grow>
+          <TextInput
+            placeholder={SEARCH_PLACEHOLDER}
+            value={query}
+            onChange={(e) => setQuery(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+            }}
+            leftSection={
+              query.length > 0 ? (
+                <span
+                  onClick={() => setQuery("")}
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <GMIcon name="X" color="var(--gm-text-muted)" />
+                </span>
+              ) : (
+                <GMIcon name="Search" color="var(--gm-text-muted)" />
+              )
+            }
+          />
+        </GMContainer>
+        <GMContainer>
+          {query.length > 0 && results.length > 0 && (
+            <GMText variant="secondary">{`${results.length} result${results.length === 1 ? "" : "s"}`}</GMText>
+          )}
         </GMContainer>
       </GMContainer>
 

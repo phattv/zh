@@ -22,7 +22,7 @@ const notoSerifSC = Noto_Serif_SC({
 });
 
 export const metadata: Metadata = {
-  title: "汉语 · Hànyǔ",
+  title: "zh.phattv.dev",
   description:
     "Search and learn Chinese words with pinyin, meanings, and Sino-Vietnamese equivalents",
 };
@@ -33,7 +33,9 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-function Body({ children }: React.PropsWithChildren<object>): React.JSX.Element {
+function Body({
+  children,
+}: React.PropsWithChildren<object>): React.JSX.Element {
   return <ZhProviders>{children}</ZhProviders>;
 }
 
