@@ -6,6 +6,7 @@
 - feat(learn): add `/api/learn/enrich` route — AI enrichment (synonyms, antonyms, example sentences, explanation in Chinese) via Claude Haiku, cached per word in session
 - feat(learn): synonyms, antonyms, compounds, and "More HSK N" suggestions are tappable for word-to-word navigation
 - feat(search): tap Chinese character in word cards navigates to /learn word detail
+- feat(search): add ZH / EN / VI chip buttons inline with search input to switch mobile keyboard language (sets `lang` attr + blur-refocus to reinitialize IME)
 
 ---
 
