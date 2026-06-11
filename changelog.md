@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-06-11
+
+- feat(search): add "Report missing word" button on no-results state — sends query to Slack and logs to Vercel
+- build(data): add `make missing word={word}` command — enriches a single word via Claude Haiku (pinyin, en, vi, sino_vi, types, HSK 2.0 level), appends to `hsk-enriched.json`, regenerates `words.ts`, and records with timestamp to `scripts/data/added-words.json`
+
+---
+
 ## 2026-06-10
 
 - feat(learn): add /learn page with HSK level + topic browse, randomize button, and word detail view

@@ -3,7 +3,7 @@ NODE ?= $(shell which node)
 
 .DEFAULT_GOAL := run
 
-.PHONY: run build build-hanzi install \
+.PHONY: run build build-hanzi install missing \
         data-download data-parse data-enrich data-generate data-pipeline data-clean data-clean-all
 
 run:
@@ -17,6 +17,15 @@ build-hanzi:
 
 install:
 	$(BUN) install
+
+# ── Missing words ─────────────────────────────────────────────────────────────
+
+missing:
+	@if [ -z "$(word)" ]; then \
+		echo "Usage: make missing word=撸串"; \
+		exit 1; \
+	fi
+	$(NODE) --env-file=.env.local scripts/add-missing-word.mjs "$(word)"
 
 # ── Data pipeline ─────────────────────────────────────────────────────────────
 

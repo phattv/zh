@@ -56533,5 +56533,17 @@
     "types": [
       "verb"
     ]
+  },
+  "撸串": {
+    "chinese": "撸串",
+    "pinyin": "lū chuàn",
+    "en": "to eat grilled skewers; to go out for skewered food",
+    "hsk": 6,
+    "vi": "ăn nướng xiên; đi ăn đồ nướng xiên",
+    "sino_vi": null,
+    "types": [
+      "verb",
+      "expression"
+    ]
   }
 }

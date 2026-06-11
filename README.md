@@ -156,6 +156,16 @@ make data-clean                             # Delete JSON intermediates (keeps s
 make data-clean-all                         # Delete everything including source txt
 ```
 
+### Adding a missing word
+
+When a word is reported missing from the search page (via Slack), add it with:
+
+```bash
+make missing word=撸串
+```
+
+This enriches the word via Claude Haiku, appends it to `hsk-enriched.json`, regenerates `words.ts`, and records it with a timestamp in `scripts/data/added-words.json`.
+
 ### Refreshing / updating
 
 - **Re-enrich specific words**: delete their entries from `hsk-enriched.json`, then re-run `make data-enrich`. It skips already-enriched words.

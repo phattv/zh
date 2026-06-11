@@ -5,9 +5,8 @@ import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
 import { WORDS, type Word } from "@/data/words";
 import { TextInput } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DrawingInput } from "./_components/DrawingInput";
-import { HANZI_CHAR_SIZE, HanziAnimation } from "./_components/HanziAnimation";
 import { Header } from "./_components/Header";
 import { WordCard } from "./_components/WordCard";
 
@@ -38,12 +37,57 @@ function filterWords(query: string): Word[] {
 }
 
 function NoResultsState({ query }: { query: string }): React.JSX.Element {
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const reportedRef = useRef<string | null>(null);
+
+  // Reset status when query changes
+  useEffect(() => {
+    if (query !== reportedRef.current) setStatus("idle");
+  }, [query]);
+
+  async function handleReport() {
+    if (status !== "idle") return;
+    setStatus("sending");
+    await fetch("/api/report-missing-word", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    });
+    reportedRef.current = query;
+    setStatus("sent");
+  }
+
   return (
     <GMContainer align="center" py="xl" gap="sm">
       <GMIcon name="Search" size="xl" color="var(--gm-text-muted)" />
       <GMText variant="subtitle">{`No results for "${query}"`}</GMText>
       <GMText variant="secondary">Search something else</GMText>
       <GMText variant="secondary">{SEARCH_PLACEHOLDER}</GMText>
+      <button
+        onClick={handleReport}
+        disabled={status !== "idle"}
+        style={{
+          marginTop: "0.5rem",
+          padding: "0.4rem 1rem",
+          border: "1px solid var(--gm-text-muted)",
+          borderRadius: "6px",
+          background: "none",
+          cursor: status === "idle" ? "pointer" : "default",
+          color:
+            status === "sent"
+              ? "var(--mantine-color-green-6)"
+              : "var(--gm-text-muted)",
+          fontSize: "0.85rem",
+          fontFamily: "inherit",
+          opacity: status === "sending" ? 0.5 : 1,
+        }}
+      >
+        {status === "sent"
+          ? "Reported — thanks!"
+          : status === "sending"
+            ? "Reporting..."
+            : "Report missing word"}
+      </button>
     </GMContainer>
   );
 }
@@ -77,60 +121,6 @@ function StartState(): React.JSX.Element {
         <GMIcon name="Book" size="xl" color="var(--mantine-color-brand-6)" bg />
         <GMText variant="title">Start searching...</GMText>
         <GMText variant="subtitle">{SEARCH_PLACEHOLDER}</GMText>
-      </GMContainer>
-
-      {/* Interactive demo */}
-      <GMContainer>
-        <GMContainer variant="row" align="center" gap="sm">
-          <div
-            onClick={() => setAnimated((a) => !a)}
-            style={{
-              width: HANZI_CHAR_SIZE,
-              height: HANZI_CHAR_SIZE,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              flexShrink: 0,
-            }}
-          >
-            {animated ? (
-              <HanziAnimation word="学" />
-            ) : (
-              <span className="zh-characters">学</span>
-            )}
-          </div>
-          <GMText variant="secondary">tap for strokes</GMText>
-        </GMContainer>
-        <GMContainer variant="row" align="center" gap="sm">
-          <div
-            style={{
-              width: HANZI_CHAR_SIZE,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <button
-              onClick={handleSpeak}
-              disabled={speaking}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: speaking ? "not-allowed" : "pointer",
-                color: "var(--mantine-color-brand-6)",
-                opacity: speaking ? 0.5 : 1,
-                fontSize: "inherit",
-                fontFamily: "inherit",
-                padding: 0,
-              }}
-            >
-              xué
-            </button>
-          </div>
-          <GMText variant="secondary">tap for sound</GMText>
-        </GMContainer>
       </GMContainer>
     </GMContainer>
   );

@@ -2538,7 +2538,7 @@ const WORDS: Word[] = [
   { chinese:"作为", pinyin:"zuòwéi", en:"regard as; act as; action; deed", vi:"làm như; hành động; tác dụng", sino_vi:"tác vi", types:[Type.V,Type.N], hsk:5 },
   { chinese:"作文", pinyin:"zuò wén", en:"write an essay; essay", vi:"viết bài; bài viết", sino_vi:"tác văn", types:[Type.V,Type.N], hsk:5 },
 
-  // HSK 6 (2499 words)
+  // HSK 6 (2500 words)
   { chinese:"挨", pinyin:"āi", en:"get close to; in sequence", vi:"sát vào; sát cạnh; tiếp liền", sino_vi:"ai", types:[Type.V,Type.Adv], hsk:6 },
   { chinese:"癌症", pinyin:"áizhèng", en:"cancer", vi:"ung thư", sino_vi:"ung chứng", types:[Type.N], hsk:6 },
   { chinese:"爱不释手", pinyin:"àibúshìshǒu", en:"love something too much to part with it", vi:"yêu quý không nỡ buông tay", sino_vi:"ái bất thích thủ", types:[Type.Expr], hsk:6 },
@@ -5038,6 +5038,7 @@ const WORDS: Word[] = [
   { chinese:"作息", pinyin:"zuòxī", en:"work and rest", vi:"công việc và nghỉ ngơi", sino_vi:"tác tức", types:[Type.N], hsk:6 },
   { chinese:"座右铭", pinyin:"zuòyòumíng", en:"motto", vi:"châm ngôn", sino_vi:"tọa hữu minh", types:[Type.N], hsk:6 },
   { chinese:"做主", pinyin:"zuòzhǔ", en:"decide; take the responsibility for a decision", vi:"quyết định", sino_vi:"tác chủ", types:[Type.V], hsk:6 },
+  { chinese:"撸串", pinyin:"lū chuàn", en:"to eat grilled skewers; to go out for skewered food", vi:"ăn nướng xiên; đi ăn đồ nướng xiên", sino_vi:null, types:[Type.V,Type.Expr], hsk:6 },
 
 ];
 
