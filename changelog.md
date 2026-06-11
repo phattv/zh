@@ -4,6 +4,8 @@
 
 - feat(search): add "Report missing word" button on no-results state — sends query to Slack and logs to Vercel
 - build(data): add `make missing word={word}` command — enriches a single word via Claude Haiku (pinyin, en, vi, sino_vi, types, HSK 2.0 level), appends to `hsk-enriched.json`, regenerates `words.ts`, and records with timestamp to `scripts/data/added-words.json`
+- feat(learn): pre-generate word enrichment (explanation, examples, synonyms, antonyms) via offline Claude Haiku pipeline — learn page reads from static `enrichments.ts` instantly with no runtime API call
+- - build(data): add `scripts/enrich-learn.mjs` (resume-safe, batched) and `scripts/generate-enrichments-ts.mjs`; add `make enrich-learn`, `make generate-enrichments`, `make learn-pipeline`
 
 ---
 

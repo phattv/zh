@@ -4,6 +4,7 @@ import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
+import { ENRICHMENTS, type Enrichment } from "@/data/enrichments";
 import { WORDS, type Word } from "@/data/words";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -102,13 +103,6 @@ function getSuggestions(word: Word, exclude?: string): Word[] {
 // +------------------+
 // | AI ENRICHMENT    |
 // +------------------+
-
-type Enrichment = {
-  explanation_zh: string;
-  examples: Array<{ zh: string; pinyin: string; en: string }>;
-  synonyms: Array<{ chinese: string; pinyin: string; en: string }>;
-  antonyms: Array<{ chinese: string; pinyin: string; en: string }>;
-};
 
 function speak(text: string, onDone?: () => void) {
   const synth = window.speechSynthesis;
@@ -239,11 +233,21 @@ function WordDetail({
 
   useEffect(() => {
     setAnimated(false);
+
+    // 1. Static enrichment already baked into git-tracked data
+    const static_ = ENRICHMENTS[word.chinese];
+    if (static_) {
+      setEnrichment(static_);
+      return;
+    }
+
+    // 2. In-memory cache for words already fetched this session
     const cached = enrichCache.current.get(word.chinese);
     if (cached) {
       setEnrichment(cached);
       return;
     }
+
     setEnrichment(null);
     setEnrichLoading(true);
     fetch("/api/learn/enrich", {

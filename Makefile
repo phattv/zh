@@ -4,7 +4,8 @@ NODE ?= $(shell which node)
 .DEFAULT_GOAL := run
 
 .PHONY: run build build-hanzi install missing \
-        data-download data-parse data-enrich data-generate data-pipeline data-clean data-clean-all
+        data-download data-parse data-enrich data-generate data-pipeline data-clean data-clean-all \
+        enrich-learn generate-enrichments learn-pipeline
 
 run:
 	$(BUN) run dev
@@ -65,3 +66,16 @@ data-clean:
 # Delete everything including downloaded source files
 data-clean-all:
 	rm -f scripts/data/hsk*.txt scripts/data/hsk-base.json scripts/data/hsk-enriched.json
+
+# ── Learn enrichment pipeline ──────────────────────────────────────────────────
+
+enrich-learn:
+	$(NODE) --env-file=.env.local scripts/enrich-learn.mjs
+
+generate-enrichments:
+	$(NODE) scripts/generate-enrichments-ts.mjs
+
+# Run both steps: enrich → generate
+learn-pipeline:
+	$(MAKE) enrich-learn
+	$(MAKE) generate-enrichments
