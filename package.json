@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 2025",
     "build": "bun run build:hanzi && next build",
-    "build:hanzi": "node scripts/build-hanzi-index.mjs",
+    "build:hanzi": "tsx scripts/drawing/1_index_strokes.ts",
     "start": "next start",
     "lint": "next lint"
   },
@@ -15,6 +15,7 @@
     "@tabler/icons-react": "^3.44.0",
     "hanzi-writer": "^3.7.3",
     "hanzi-writer-data": "^2.0.1",
+    "jsonrepair": "^3.14.0",
     "next": "^16.2.7",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
@@ -25,6 +26,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^10.4.1",
     "eslint-config-next": "^16.2.7",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }

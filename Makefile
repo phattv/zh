@@ -1,11 +1,9 @@
-BUN  ?= $(shell which bun)
-NODE ?= $(shell which node)
+BUN ?= $(shell which bun)
 
 .DEFAULT_GOAL := run
 
 .PHONY: run build build-hanzi install missing \
-        data-download data-parse data-enrich data-generate data-pipeline data-clean data-clean-all \
-        enrich-learn generate-enrichments learn-pipeline
+        db-download db-parse db-enrich db-generate db-pipeline db-clean db-clean-all
 
 run:
 	$(BUN) run dev
@@ -19,63 +17,63 @@ build-hanzi:
 install:
 	$(BUN) install
 
-# ── Missing words ─────────────────────────────────────────────────────────────
+# ── Missing words ──────────────────────────────────────────────────────────────
 
 missing:
 	@if [ -z "$(word)" ]; then \
 		echo "Usage: make missing word=撸串"; \
 		exit 1; \
 	fi
-	$(NODE) --env-file=.env.local scripts/add-missing-word.mjs "$(word)"
+	$(BUN) scripts/missing_word/1_add_missing_word.ts "$(word)"
 
-# ── Data pipeline ─────────────────────────────────────────────────────────────
+# ── Database pipeline ──────────────────────────────────────────────────────────
 
-data-download:
-	$(NODE) scripts/download-hsk.mjs
+db-download:
+	$(BUN) scripts/database/1_download_raw.ts
 
-data-parse:
-	$(NODE) scripts/parse-hsk.mjs
+db-parse:
+	$(BUN) scripts/database/2_concat_base.ts
 
-data-enrich:
-	@if [ -z "$(ANTHROPIC_API_KEY)" ]; then \
-		echo "Error: ANTHROPIC_API_KEY is not set"; \
-		echo "Usage: make data-enrich ANTHROPIC_API_KEY=sk-ant-..."; \
-		exit 1; \
-	fi
-	$(NODE) scripts/enrich-words.mjs
+db-enrich:
+	$(BUN) scripts/database/3_enrich_word.ts
 
-data-generate:
-	$(NODE) scripts/generate-words-ts.mjs
+db-generate:
+	$(BUN) scripts/database/4_generate_database.ts
 
-# Run the full pipeline (download → parse → enrich → generate)
-data-pipeline:
-	@if [ -z "$(ANTHROPIC_API_KEY)" ]; then \
-		echo "Error: ANTHROPIC_API_KEY is not set"; \
-		echo "Usage: make data-pipeline ANTHROPIC_API_KEY=sk-ant-..."; \
-		exit 1; \
-	fi
-	$(MAKE) data-download
-	$(MAKE) data-parse
-	$(MAKE) data-enrich ANTHROPIC_API_KEY=$(ANTHROPIC_API_KEY)
-	$(MAKE) data-generate
+# Run the full pipeline: download → parse → enrich → generate
+db-pipeline:
+	@echo ""
+	@echo "════════════════════════════════════════"
+	@echo "  DATABASE PIPELINE"
+	@echo "  Started: $$(date '+%H:%M:%S')"
+	@echo "════════════════════════════════════════"
+	@echo ""
+	@echo "── Step 1/4  Download raw HSK files ────"
+	@_T=$$(date +%s); $(MAKE) --no-print-directory db-download; \
+	  echo "   done in $$(( $$(date +%s) - $$_T ))s"
+	@echo ""
+	@echo "── Step 2/4  Parse → base.json ─────────"
+	@_T=$$(date +%s); $(MAKE) --no-print-directory db-parse; \
+	  echo "   done in $$(( $$(date +%s) - $$_T ))s"
+	@echo ""
+	@echo "── Step 3/4  Enrich (Claude Haiku) ─────"
+	@echo "   This step is long — each batch logs progress."
+	@_T=$$(date +%s); $(MAKE) --no-print-directory db-enrich; \
+	  echo "   done in $$(( $$(date +%s) - $$_T ))s"
+	@echo ""
+	@echo "── Step 4/4  Generate src/database.ts ──"
+	@_T=$$(date +%s); $(MAKE) --no-print-directory db-generate; \
+	  echo "   done in $$(( $$(date +%s) - $$_T ))s"
+	@echo ""
+	@echo "════════════════════════════════════════"
+	@echo "  DONE  Finished: $$(date '+%H:%M:%S')"
+	@echo "════════════════════════════════════════"
+	@echo ""
 
-# Delete intermediate files to force a full re-run (keeps downloaded source txt files)
-data-clean:
-	rm -f scripts/data/hsk-base.json scripts/data/hsk-enriched.json
+# Delete JSON intermediates (keeps source txt files)
+db-clean:
+	rm -f scripts/database/data/2_base.json scripts/database/data/3_enriched.json
 
 # Delete everything including downloaded source files
-data-clean-all:
-	rm -f scripts/data/hsk*.txt scripts/data/hsk-base.json scripts/data/hsk-enriched.json
-
-# ── Learn enrichment pipeline ──────────────────────────────────────────────────
-
-enrich-learn:
-	$(NODE) --env-file=.env.local scripts/enrich-learn.mjs
-
-generate-enrichments:
-	$(NODE) scripts/generate-enrichments-ts.mjs
-
-# Run both steps: enrich → generate
-learn-pipeline:
-	$(MAKE) enrich-learn
-	$(MAKE) generate-enrichments
+db-clean-all:
+	rm -f scripts/database/data/1_hsk*.txt scripts/database/data/2_base.json scripts/database/data/3_enriched.json

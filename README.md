@@ -1,4 +1,4 @@
-# 汉语 · Hànyǔ
+# zh.phattv.dev
 
 A personal Chinese learning tool built mobile-first, with a focus on the Sino-Vietnamese connection.
 
@@ -7,7 +7,7 @@ A personal Chinese learning tool built mobile-first, with a focus on the Sino-Vi
 - **Next.js 16** (App Router) + **React 19**
 - **Mantine 9** UI + custom GM\* design system
 - **Bun** package manager
-- Data: static `words.ts` → Supabase + AI-generated (planned)
+- Data: static `database.ts` — auto-generated from open data + Claude enrichment
 
 ## Running locally
 
@@ -46,7 +46,7 @@ The dictionary. Look up any word across all supported fields.
 
 ### Learn 🔲
 
-Browse and study words. Mostly deterministic with some AI-generated enrichment cached per word.
+Browse and study words. All enrichment is pre-generated and instant — no async calls.
 
 **Browse** words by:
 
@@ -55,11 +55,10 @@ Browse and study words. Mostly deterministic with some AI-generated enrichment c
 
 **Word detail** — tap any card to expand:
 
-- Meaning explained in Chinese
-- Example sentences (AI-generated, cached)
-- Synonyms and antonyms
+- Meaning explained in Chinese (dictionary-style)
+- Example sentences (3 per word)
+- Synonyms and antonyms (tap to navigate)
 - Words that contain the current word (compounds)
-- Radical breakdown and component/compound tree
 
 ---
 
@@ -115,63 +114,92 @@ Chinese writing assistant. AI-driven.
 
 ## Data
 
-`src/data/words.ts` is words database across HSK 1–6, auto-generated from open data + Claude enrichment. **Do not edit it by hand.**
+`src/database.ts` is the word database across HSK 1–6, auto-generated from open data + Claude enrichment. **Do not edit it by hand.**
 
 Each word:
 
 ```ts
 {
-  chinese: "学习",
-  pinyin:  "xuéxí",
-  en:      "to study; to learn",
-  vi:      "học tập; học hỏi",   // Claude-generated
-  sino_vi: "HỌC TẬP",            // Claude-generated, null if none
-  types:   [Type.V],             // Claude-generated
-  hsk:     2,
+  chinese:  "学习",
+  pinyin:   "xuéxí",
+  en:       "to study; to learn",
+  vi:       "học tập; học hỏi",
+  sino_vi:  "HỌC TẬP",              // null if no Sino-Vietnamese form
+  types:    [Type.V],
+  hsk:      2,
+  zh:       "学习是指通过阅读、练习等方式获取知识或技能。",
+  examples: [
+    { zh: "我每天学习汉语。", pinyin: "Wǒ měitiān xuéxí Hànyǔ.", en: "I study Chinese every day." },
+    // ...
+  ],
+  synonyms: ["学", "研究"],          // Chinese only — pinyin/en looked up from WORDS at runtime
+  antonyms: [],
 }
+```
+
+### Scripts
+
+All offline pipeline scripts live in `scripts/` and are written in TypeScript, run with `tsx`.
+
+```
+scripts/
+  constants.ts              ← shared: MODEL, VALID_TYPES, BaseWord, UnifiedWord types
+  database/
+    1_download_raw.ts       ← fetch source txt from GitHub
+    2_concat_base.ts        ← parse txt → 2_base.json
+    3_enrich_word.ts        ← Claude Haiku → 3_enriched.json  (resume-safe)
+    4_generate_database.ts  ← emit src/database.ts
+    data/
+      1_hsk{1..6}.txt
+      2_base.json
+      3_enriched.json
+  drawing/
+    1_index_strokes.ts      ← build public/hanzi-index/index.json
+  missing_word/
+    1_add_missing_word.ts   ← enrich + append a single word
+    data/
+      1_added.json
 ```
 
 ### Pipeline
 
-Four scripts in `scripts/` build the word list from scratch:
-
-| Step | Script                  | Input               | Output                           | Notes               |
-| ---- | ----------------------- | ------------------- | -------------------------------- | ------------------- |
-| 0    | `download-hsk.mjs`      | glxxyz/hskhsk.com   | `scripts/data/hsk{1..6}.txt`     | Requires internet   |
-| 1    | `parse-hsk.mjs`         | `hsk{1..6}.txt`     | `scripts/data/hsk-base.json`     | Deterministic       |
-| 2    | `enrich-words.mjs`      | `hsk-base.json`     | `scripts/data/hsk-enriched.json` | Claude Haiku, ~$1–4 |
-| 3    | `generate-words-ts.mjs` | `hsk-enriched.json` | `src/data/words.ts`              | Deterministic       |
+| Step | Script                         | Input             | Output                          | Notes               |
+| ---- | ------------------------------ | ----------------- | ------------------------------- | ------------------- |
+| 1    | `database/1_download_raw`      | glxxyz/hskhsk.com | `database/data/1_hsk{1..6}.txt` | Requires internet   |
+| 2    | `database/2_concat_base`       | `1_hsk{1..6}.txt` | `database/data/2_base.json`     | Deterministic       |
+| 3    | `database/3_enrich_word`       | `2_base.json`     | `database/data/3_enriched.json` | Claude Haiku, ~$3–6 |
+| 4    | `database/4_generate_database` | `3_enriched.json` | `src/database.ts`             | Deterministic       |
 
 ### Make commands
 
 ```bash
-make data-download                          # Step 0 — fetch source txt files from GitHub
-make data-parse                             # Step 1 — parse txt → hsk-base.json
-make data-enrich ANTHROPIC_API_KEY=sk-...   # Step 2 — enrich → hsk-enriched.json
-make data-generate                          # Step 3 — generate src/data/words.ts
+make db-download    # Step 1 — fetch source txt files from GitHub
+make db-parse       # Step 2 — parse txt → 2_base.json
+make db-enrich      # Step 3 — enrich → 3_enriched.json  (reads ANTHROPIC_API_KEY from .env.local)
+make db-generate    # Step 4 — generate src/database.ts
 
-make data-pipeline ANTHROPIC_API_KEY=sk-... # Run all 4 steps in sequence
+make db-pipeline    # Run all 4 steps in sequence
 
-make data-clean                             # Delete JSON intermediates (keeps source txt)
-make data-clean-all                         # Delete everything including source txt
+make db-clean       # Delete JSON intermediates (keeps source txt)
+make db-clean-all   # Delete everything including source txt
 ```
 
 ### Adding a missing word
 
-When a word is reported missing from the search page (via Slack), add it with:
+When a word is reported missing from the search page, add it with:
 
 ```bash
 make missing word=撸串
 ```
 
-This enriches the word via Claude Haiku, appends it to `hsk-enriched.json`, regenerates `words.ts`, and records it with a timestamp in `scripts/data/added-words.json`.
+This enriches the word via Claude Haiku (all fields), appends it to `3_enriched.json`, regenerates `database.ts`, and records it with a timestamp in `missing_word/data/1_added.json`.
 
 ### Refreshing / updating
 
-- **Re-enrich specific words**: delete their entries from `hsk-enriched.json`, then re-run `make data-enrich`. It skips already-enriched words.
-- **Add new words**: append to `hsk-base.json` manually, then run `make data-enrich` + `make data-generate`.
-- **Fix a bad translation**: edit the entry directly in `hsk-enriched.json`, then run `make data-generate`.
-- **Full regeneration**: `make data-clean-all` then `make data-pipeline`. Expect ~$1–4 in Claude API costs in around 10-20 minutes.
+- **Re-enrich specific words**: delete their entries from `3_enriched.json`, then re-run `make db-enrich`. It skips already-enriched words.
+- **Add new words**: append to `2_base.json` manually, then run `make db-enrich` + `make db-generate`.
+- **Fix a bad entry**: edit directly in `3_enriched.json`, then run `make db-generate`.
+- **Full regeneration**: `make db-clean-all` then `make db-pipeline`. Expect ~$3–6 in Claude API costs over ~20 minutes.
 
 ---
 

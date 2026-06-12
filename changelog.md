@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-06-12
+
+- build(database): rewrite offline enrichment pipeline as 4-step TypeScript process (`1_download_raw` → `2_concat_base` → `3_enrich_word` → `4_generate_database`) generating `src/database.ts` with 4995 HSK words — each word includes Vietnamese translation, Hán Việt reading, grammar types, example sentences, synonyms, and antonyms
+- refactor(data): replace `src/data/words.ts` + `src/data/enrichments.ts` + `/api/learn/enrich` with single pre-generated `src/database.ts` — learn page loads instantly with no runtime API calls
+- fix(pipeline): add `jsonrepair` + solo-word fallback to recover malformed Claude JSON (unquoted Chinese characters in synonyms/antonyms arrays)
+- refactor(scripts): reorganize into `database/`, `drawing/`, `missing_word/` subdirectories; convert all scripts from `.mjs` to TypeScript with shared `constants.ts`
+
+---
+
 ## 2026-06-11
 
 - feat(search): add "Report missing word" button on no-results state — sends query to Slack and logs to Vercel

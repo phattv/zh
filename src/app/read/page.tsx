@@ -4,7 +4,7 @@ import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
-import { type Word } from "@/data/words";
+import { type Word } from "@/database";
 import { segmentText, type Segment, type WordSegment } from "@/lib/segment";
 import { Table, Textarea } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";

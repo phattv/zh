@@ -1,4 +1,4 @@
-import { WORDS, type Word } from "@/data/words";
+import { WORDS, type Word } from "@/database";
 
 /** A recognized dictionary word with its full {@link Word} record. */
 export type WordSegment = { type: "word"; text: string; word: Word };

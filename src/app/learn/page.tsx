@@ -4,17 +4,9 @@ import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
-import { ENRICHMENTS, type Enrichment } from "@/data/enrichments";
-import { WORDS, type Word } from "@/data/words";
+import { WORDS, type Word } from "@/database";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { HANZI_CHAR_SIZE, HanziAnimation } from "../_components/HanziAnimation";
 import { Header } from "../_components/Header";
 
@@ -99,10 +91,6 @@ function getSuggestions(word: Word, exclude?: string): Word[] {
   const shuffled = sameHsk.sort(() => Math.random() - 0.5).slice(0, 6);
   return shuffled;
 }
-
-// +------------------+
-// | AI ENRICHMENT    |
-// +------------------+
 
 function speak(text: string, onDone?: () => void) {
   const synth = window.speechSynthesis;
@@ -210,6 +198,85 @@ function MiniWordCard({
 }
 
 // +------------------+
+// | WORD RELATED     |
+// +------------------+
+
+function WordRelatedList({
+  title,
+  items,
+  onNavigate,
+}: {
+  title: string;
+  items: string[];
+  onNavigate: (w: Word) => void;
+}): React.JSX.Element {
+  return (
+    <GMContainer gap="sm">
+      <GMContainer variant="row" gap="sm" align="center">
+        <GMIcon name="Sparkles" color="var(--mantine-color-brand-6)" />
+        <GMText variant="section_title">{title}</GMText>
+      </GMContainer>
+      <GMContainer variant="card" px="sm" py="sm">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem 1.5rem" }}>
+          {items.map((chinese) => {
+            const target = WORDS.find((w) => w.chinese === chinese);
+            return (
+              <div
+                key={chinese}
+                role={target ? "button" : undefined}
+                tabIndex={target ? 0 : undefined}
+                onClick={target ? () => onNavigate(target) : undefined}
+                onKeyDown={
+                  target
+                    ? (e) => e.key === "Enter" && onNavigate(target)
+                    : undefined
+                }
+                className={target ? "gm-row-button" : undefined}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.1rem",
+                  padding: "0.25rem",
+                  borderRadius: "var(--mantine-radius-sm)",
+                  cursor: target ? "pointer" : "default",
+                }}
+              >
+                <span
+                  className="zh-characters"
+                  style={{ fontSize: "1.1rem", lineHeight: 1.5 }}
+                >
+                  {chinese}
+                </span>
+                {target && (
+                  <>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "var(--gm-text-muted)",
+                      }}
+                    >
+                      {target.pinyin}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "var(--gm-text-muted)",
+                      }}
+                    >
+                      {target.en}
+                    </span>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </GMContainer>
+    </GMContainer>
+  );
+}
+
+// +------------------+
 // | WORD DETAIL      |
 // +------------------+
 
@@ -224,49 +291,12 @@ function WordDetail({
 }): React.JSX.Element {
   const [animated, setAnimated] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const [enrichment, setEnrichment] = useState<Enrichment | null>(null);
-  const [enrichLoading, setEnrichLoading] = useState(false);
-  const enrichCache = useRef<Map<string, Enrichment>>(new Map());
 
   const compounds = useMemo(() => findCompounds(word), [word]);
   const suggestions = useMemo(() => getSuggestions(word), [word]);
 
   useEffect(() => {
     setAnimated(false);
-
-    // 1. Static enrichment already baked into git-tracked data
-    const static_ = ENRICHMENTS[word.chinese];
-    if (static_) {
-      setEnrichment(static_);
-      return;
-    }
-
-    // 2. In-memory cache for words already fetched this session
-    const cached = enrichCache.current.get(word.chinese);
-    if (cached) {
-      setEnrichment(cached);
-      return;
-    }
-
-    setEnrichment(null);
-    setEnrichLoading(true);
-    fetch("/api/learn/enrich", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chinese: word.chinese,
-        pinyin: word.pinyin,
-        en: word.en,
-        hsk: word.hsk,
-      }),
-    })
-      .then((r) => r.json())
-      .then((data: Enrichment) => {
-        enrichCache.current.set(word.chinese, data);
-        setEnrichment(data);
-      })
-      .catch(() => setEnrichment(null))
-      .finally(() => setEnrichLoading(false));
   }, [word]);
 
   function handleSpeak() {
@@ -349,175 +379,51 @@ function WordDetail({
           </GMContainer>
         </GMContainer>
 
-        {/* AI: Synonyms */}
-        {enrichment?.synonyms?.length ? (
+        {/* Synonyms */}
+        {word.synonyms?.length ? (
+          <WordRelatedList
+            title="Synonyms"
+            items={word.synonyms}
+            onNavigate={onNavigate}
+          />
+        ) : null}
+
+        {/* Antonyms */}
+        {word.antonyms?.length ? (
+          <WordRelatedList
+            title="Antonyms"
+            items={word.antonyms}
+            onNavigate={onNavigate}
+          />
+        ) : null}
+
+        {/* Meaning in Chinese */}
+        {word.zh ? (
           <GMContainer gap="sm">
             <GMContainer variant="row" gap="sm" align="center">
               <GMIcon name="Sparkles" color="var(--mantine-color-brand-6)" />
-              <GMText variant="section_title">Synonyms</GMText>
+              <GMText variant="section_title">Meaning in Chinese</GMText>
             </GMContainer>
-            <GMContainer variant="card" px="sm" py="sm">
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "1rem 1.5rem",
-                }}
-              >
-                {enrichment.synonyms.map((s) => {
-                  const target = WORDS.find((w) => w.chinese === s.chinese);
-                  return (
-                    <div
-                      key={s.chinese}
-                      role={target ? "button" : undefined}
-                      tabIndex={target ? 0 : undefined}
-                      onClick={target ? () => onNavigate(target) : undefined}
-                      onKeyDown={
-                        target
-                          ? (e) => e.key === "Enter" && onNavigate(target)
-                          : undefined
-                      }
-                      className={target ? "gm-row-button" : undefined}
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.1rem",
-                        padding: "0.25rem",
-                        borderRadius: "var(--mantine-radius-sm)",
-                        cursor: target ? "pointer" : "default",
-                      }}
-                    >
-                      <span
-                        className="zh-characters"
-                        style={{ fontSize: "1.1rem", lineHeight: 1.5 }}
-                      >
-                        {s.chinese}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "var(--gm-text-muted)",
-                        }}
-                      >
-                        {s.pinyin}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "var(--gm-text-muted)",
-                        }}
-                      >
-                        {s.en}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </GMContainer>
-          </GMContainer>
-        ) : null}
-
-        {/* AI: Antonyms */}
-        {enrichment?.antonyms?.length ? (
-          <GMContainer gap="sm">
-            <GMContainer variant="row" gap="sm" align="center">
-              <GMIcon name="Sparkles" color="var(--mantine-color-brand-6)" />
-              <GMText variant="section_title">Antonyms</GMText>
-            </GMContainer>
-            <GMContainer variant="card" px="sm" py="sm">
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "1rem 1.5rem",
-                }}
-              >
-                {enrichment.antonyms.map((a) => {
-                  const target = WORDS.find((w) => w.chinese === a.chinese);
-                  return (
-                    <div
-                      key={a.chinese}
-                      role={target ? "button" : undefined}
-                      tabIndex={target ? 0 : undefined}
-                      onClick={target ? () => onNavigate(target) : undefined}
-                      onKeyDown={
-                        target
-                          ? (e) => e.key === "Enter" && onNavigate(target)
-                          : undefined
-                      }
-                      className={target ? "gm-row-button" : undefined}
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.1rem",
-                        padding: "0.25rem",
-                        borderRadius: "var(--mantine-radius-sm)",
-                        cursor: target ? "pointer" : "default",
-                      }}
-                    >
-                      <span
-                        className="zh-characters"
-                        style={{ fontSize: "1.1rem", lineHeight: 1.5 }}
-                      >
-                        {a.chinese}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "var(--gm-text-muted)",
-                        }}
-                      >
-                        {a.pinyin}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "var(--gm-text-muted)",
-                        }}
-                      >
-                        {a.en}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </GMContainer>
-          </GMContainer>
-        ) : null}
-
-        {/* AI: Explanation in Chinese */}
-        <GMContainer gap="sm">
-          <GMContainer variant="row" gap="sm" align="center">
-            <GMIcon name="Sparkles" color="var(--mantine-color-brand-6)" />
-            <GMText variant="section_title">Meaning in Chinese</GMText>
-          </GMContainer>
-          {enrichLoading ? (
-            <GMText variant="secondary">Loading…</GMText>
-          ) : enrichment?.explanation_zh ? (
             <GMContainer variant="card" px="sm" py="sm">
               <span
                 className="zh-characters"
                 style={{ fontSize: "1rem", lineHeight: 1.6 }}
               >
-                {enrichment.explanation_zh}
+                {word.zh}
               </span>
             </GMContainer>
-          ) : !enrichLoading && !enrichment ? (
-            <GMText variant="secondary">Could not load enrichment.</GMText>
-          ) : null}
-        </GMContainer>
-
-        {/* AI: Example sentences */}
-        <GMContainer gap="sm">
-          <GMContainer variant="row" gap="sm" align="center">
-            <GMIcon name="Sparkles" color="var(--mantine-color-brand-6)" />
-            <GMText variant="section_title">Example Sentences</GMText>
           </GMContainer>
-          {enrichLoading ? (
-            <GMText variant="secondary">Loading…</GMText>
-          ) : enrichment?.examples?.length ? (
+        ) : null}
+
+        {/* Example sentences */}
+        {word.examples?.length ? (
+          <GMContainer gap="sm">
+            <GMContainer variant="row" gap="sm" align="center">
+              <GMIcon name="Sparkles" color="var(--mantine-color-brand-6)" />
+              <GMText variant="section_title">Example Sentences</GMText>
+            </GMContainer>
             <GMContainer variant="card" px="sm" py="sm" gap="sm">
-              {enrichment.examples.map((ex, i) => (
+              {word.examples.map((ex, i) => (
                 <GMContainer key={i}>
                   <span
                     className="zh-characters"
@@ -530,8 +436,8 @@ function WordDetail({
                 </GMContainer>
               ))}
             </GMContainer>
-          ) : null}
-        </GMContainer>
+          </GMContainer>
+        ) : null}
 
         {/* Compounds */}
         {compounds.length > 0 && (

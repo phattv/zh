@@ -1,4 +1,4 @@
-import { WORDS, type Word } from "@/data/words";
+import { WORDS, type Word } from "@/database";
 
 /**
  * Strips diacritics for accent-insensitive search across pinyin, Vietnamese, and Sino-Vietnamese.

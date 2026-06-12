@@ -3,7 +3,7 @@
 import { GMContainer } from "@/components/GMContainer";
 import { GMIcon } from "@/components/GMIcon";
 import { GMText } from "@/components/GMText";
-import { WORDS, type Word } from "@/data/words";
+import { WORDS, type Word } from "@/database";
 import { TextInput } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DrawingInput } from "./_components/DrawingInput";

@@ -4,7 +4,7 @@ import { GMButton } from "@/components/GMButton";
 import { GMContainer } from "@/components/GMContainer";
 import { GMText } from "@/components/GMText";
 import { ROUTES } from "@/constants/routes";
-import { type Word } from "@/data/words";
+import { type Word } from "@/database";
 import Link from "next/link";
 import { useState } from "react";
 import { HANZI_CHAR_SIZE } from "./HanziAnimation";
